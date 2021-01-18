@@ -1,0 +1,2036 @@
+package sg.com.controller;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.net.Authenticator;
+import java.net.InetAddress;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import sg.com.dao.CM400DAO;
+import sg.com.dao.ContractIssuanceDAO;
+import sg.com.dao.DBSessionInfoDAO;
+import sg.com.dao.DSConfigDAO;
+import sg.com.dao.ProcSuspendTrackerDAO;
+import sg.com.dao.TWPROCXDAO;
+import sg.com.dao.UserDAO;
+import sg.com.dao.WorkItemDAO;
+import sg.com.dao.WorkItemTWPROCDAO;
+import sg.com.dao.XXTransactionDAO;
+import sg.com.dto.CMActivity;
+import sg.com.dto.ConcurrentCaseRecord;
+import sg.com.dto.ConcurrentTrackerRecord;
+import sg.com.dto.ConcurrentWorkflowInstance;
+import sg.com.dto.DBSessionInfo;
+import sg.com.dto.DSSearchQuery;
+import sg.com.dto.DecisionAuditItem;
+import sg.com.dto.DocTypeInfo;
+import sg.com.dto.Document;
+import sg.com.dto.FlotPieData;
+import sg.com.dto.ProcSuspendTracker;
+import sg.com.dto.RPARequest;
+import sg.com.dto.User;
+import sg.com.dto.WebFormUser;
+import sg.com.dto.WorkItem;
+import sg.com.dto.XXTransactionRecord;
+import sg.com.processor.BPMInterface;
+import sg.com.util.MyAuthenticator;
+
+@Controller
+@RequestMapping("pages/ajax")
+public class AjaxController {
+	
+	@Resource(name="DSConfigDAO")
+	DSConfigDAO dsConfig;
+	
+	@Resource(name="TWPROCXDAO")
+	TWPROCXDAO twprocx;
+	
+	@Resource(name="userdao")
+	UserDAO userdao;
+	
+	@Resource(name="cm400dao")
+	CM400DAO cm400dao;
+	
+	@Resource(name="workitemdao")
+	WorkItemDAO workitemdao;
+	
+	@Resource(name="WorkItemTWPROCDAO")
+	WorkItemTWPROCDAO twprocdao;
+	
+	@Resource(name="xxtransactiondao")
+	XXTransactionDAO xxtxndao;
+	
+	@Resource(name="ProcSuspendTrackerDAO")
+	ProcSuspendTrackerDAO pstdao;
+	
+	
+	@Resource(name="DBSessionInfo")
+	DBSessionInfoDAO dbSessionDAO;
+	
+	@Resource(name="ContractIssuanceDAO")
+	ContractIssuanceDAO ciDao;	
+
+	@Resource(name="BPMInterface")
+	BPMInterface bpmInterface;
+	
+	@Resource(name="bpmAuthentication")
+	MyAuthenticator authenticator;
+	
+	
+	public MyAuthenticator getAuthenticator() {
+		return authenticator;
+	}
+
+	public void setAuthenticator(MyAuthenticator authenticator) {
+		this.authenticator = authenticator;
+	}
+	
+	private String bpmRoles="_AVIVANBHKUSERS,_AVIVAPSHKUSERS,_HKL_APPREQ_GROUP,_HKL_DE,_HKL_DE_SHK1,_HKL_DESPATCH,_HKL_DMU,_HKL_DOC_VERIFY,_HKL_DOCVERIFY,_HKL_DV,_HKL_HKSNR_UW,_HKL_NB_FOLLOWUP,_HKL_NBADMIN,_HKL_PM,_HKL_U,_HKL_VERIFY,_MANAGERS_GROUP,_NB_HK_ADMIN,_PS_HK_ALTERATION,_PS_HK_ALTERATION_CHECKER,_PS_HK_APPROVER1,_PS_HK_APPROVER3,_PS_HK_APPROVER4,_PS_HK_APPROVER5,_PS_HK_FINANCIAL,_PS_HK_FINANCIAL_CHECER,_PS_HK_ILP,_PS_HK_ILP_CHECKER,_PS_HK_OPS,_PS_HK_SENIOR_UW,_PS_HK_UW,_PS_HKL_VERIFY,_SGL_HKSNR_UW,_SGL_NBHK_GROUP,BVIHKUSERS,HK_NBLIFEMANAGERS,HK_NBLIFEUWMANAGERS,HKNBADMINLIFEMANAGERS,MGR_RASSIGN_GROUP,MIDASHNBUSERS,MIDASHPSUSERS,NBLIFEMANAGERS,PSLIFEMANAGERS,_SGL_AA_UW,_SGL_APS_UW,_SGL_NONAPS_UW,_SGL_UL_UW,_SGL_SGSNR_AA_UW,_SGL_SGSNR_APS_UW,_SGL_SGSNR_NONAPS_UW,_SGL_DE,_SGL_DE_APS,_SGL_DE_APS_HEALTHOPERATORS,_SGL_DE_HEALTHOPERATORS,_SGL_DV,_SGL_DV_APS,_SGL_NB_ESH,_SGL_NB_GROUP,_SGL_NB_GROUP_APS,_SGL_UW_ADMIN,_SGL_APS_UWADMIN,_SGL_TELEINTERVIEW,_SGL_APPREQ_GROUP1,_SGL_APPREQ_GROUP2,_SGL_APPREQ_GROUP3,_SGL_APSCONSULTANT,_SGL_ESH,_SGL_ESA,_SGL_UL_CM,_SGL_DMU,_SGL_NB_COMPLIANCE,_PSL_SG_SENIOR_UW,_PS_SG_UW,_PS_SG_SENIOR_UW,_PSL_SG_APPROVER1,_PSL_SG_APPROVER2,_PSL_SG_APPROVER3,_PSL_SG_APPROVER4,_PSL_SG_APPROVER5,_PSL_SG_GROUPA,_PSL_SG_GROUPB,_PSL_SG_GROUPD,_PSL_SG_GROUPC,_PS_SGL_VERIFY,_PSL_SG_OPS,_CS_SG_SO,_PSL_PM,MIDASHCCUSERS,MIDASHNBUSERS,MIDASHPMUSERS,MIDASHDMUSERS,AUWREPUSERS,BVIALLUSERS,BVISGUSERS,_MANAGERS_GROUP,NBLIFEMANAGERS,PSLIFEMANAGERS,ALTERATIONMANAGERS,SGNBADMINLIFEMANAGERS,NBPSADMINMANAGERS,PMMANAGERS,DMUMANAGERS,_AVIVANBSGUSERS,_AVIVAPSSGUSERS";
+	
+	private static final Logger logger = Logger.getLogger(AjaxController.class);	
+	
+	@RequestMapping(value="/getBPMRolesToAssign.do",method=RequestMethod.GET)
+	public @ResponseBody String getBPMRolesToAssign(){
+		String bpmGroups=twprocdao.getBPMGroup();
+		
+		return bpmGroups;
+	}
+	
+	@RequestMapping(value="/addWebForm.do",params = {"userId","email","country"})
+	public @ResponseBody String addWebFormUser(@RequestParam(value = "userId") String userId, 
+			@RequestParam(value = "email") String email, 
+			@RequestParam(value = "country") String country){
+
+		WebFormUser wfUser = new WebFormUser();
+		
+		wfUser.setUserId(userId);
+		wfUser.setCountry(country);
+		wfUser.setEmailAddress(email);
+		
+		boolean status = pstdao.addWebFormUser(wfUser);
+		
+		return "";
+		
+		
+	}
+	
+	@RequestMapping(value="/resumeITExceptionCases.do",params = {"instanceIds"})
+	public @ResponseBody String resumeITExceptionCases(@RequestParam(value = "instanceIds") String instanceIds){
+		
+		int resumedCount = 0;
+		
+		String instanceIdArray[] = instanceIds.split(",");
+		
+		for (String instanceId:instanceIdArray){
+			if (!instanceId.equalsIgnoreCase("")){
+				try{
+					WorkItem result = twprocdao.getLatestActiveTask(instanceId);
+					if(result != null){
+						String taskId = result.getTask_id().toString();
+						String taskActivityName = result.getTask_activity_name();
+						if(taskActivityName.startsWith("IT Exception")){
+							bpmInterface.completeCase(taskId, null);
+							resumedCount++;
+						}
+					}
+										
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return String.valueOf(resumedCount);
+	}
+	
+	@RequestMapping(value="/resumeStuckCases.do",params = {"instanceIds"})
+	public @ResponseBody String resumeStuckCases(@RequestParam(value = "instanceIds") String instanceIds){
+		
+		int resumedCount = 0;
+		
+		String instanceIdArray[] = instanceIds.split(",");
+		
+		for (String instanceId:instanceIdArray){
+			if (!instanceId.equalsIgnoreCase("")){
+				try{
+					bpmInterface.resumeInstance(instanceId);
+					resumedCount++;
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return String.valueOf(resumedCount);
+
+	}	
+	
+	@RequestMapping(value="/suspendCases.do",params = {"instanceIds"})
+	public @ResponseBody String suspendCases(@RequestParam(value = "instanceIds") String instanceIds){
+		
+		int resumedCount = 0;
+		
+		String instanceIdArray[] = instanceIds.split(",");
+		
+		for (String instanceId:instanceIdArray){
+			if (!instanceId.equalsIgnoreCase("")){
+				try{
+					bpmInterface.suspendInstance(instanceId);
+					resumedCount++;
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return String.valueOf(resumedCount);
+	}	
+	
+	
+	
+	@RequestMapping(value="/addRoles.do",params = {"userId","roles"})
+	public @ResponseBody String addRoles(@RequestParam(value = "userId") String userId, @RequestParam(value = "roles") String roles){
+		String []selectedRoles = roles.split(";");
+		String outputMessage="";
+
+		logger.debug("Adding BPM roles for" + userId + ": " + selectedRoles);
+		
+		for (String role:selectedRoles){
+			try {
+				bpmInterface.addMember(userId, role);
+				outputMessage+="Successfully added " + userId + " to " + role + " role.<br>";
+				logger.debug("adding BPM roles successful for" + userId + ": " + role);
+			} catch (Exception e){
+				
+				outputMessage+="<div style='color:red'>Failed to add " + userId + " to " + role + " role.</div><br>";
+				logger.debug("failed to add BPM roles for" + userId); 
+			}
+		}
+		logger.debug(outputMessage);
+		return outputMessage;
+		
+		
+	}
+	
+	@RequestMapping(value="/getFailedRPACases.do",method=RequestMethod.GET)
+	public @ResponseBody String getFailedRPACases(){
+		String jsonString="";
+		
+		List <RPARequest> failedRPARequests = xxtxndao.getFailedRPARequests();
+
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);    	
+    	
+    	try {
+			jsonString = mapper.writeValueAsString(failedRPARequests);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, failedRPARequests.size(), failedRPARequests.size());
+    	
+    	
+        return jsonString;		
+				
+	}
+	
+	
+	@RequestMapping(value="/getStuckConcurrentCases.do",method=RequestMethod.GET)
+	public @ResponseBody String getStuckConcurrentCases(){
+		String jsonString="";
+		
+		List <WorkItem> stuckConcurrentCases = twprocdao.getStuckConcurrentCases();
+
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);    	
+    	try {
+			jsonString = mapper.writeValueAsString(stuckConcurrentCases);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, stuckConcurrentCases.size(), stuckConcurrentCases.size());
+    	
+    	
+        return jsonString;		
+				
+	}	
+	
+	@RequestMapping(value="/getConcurrentCases.do",method=RequestMethod.GET)
+	public @ResponseBody String getConcurrentCases(){
+		
+		String jsonString="";		
+		List <ConcurrentWorkflowInstance> concurrentCases = twprocdao.getConcurrentCases();
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);    	
+    	try {
+			jsonString = mapper.writeValueAsString(concurrentCases);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	jsonString=getDataTableJsonString(jsonString, concurrentCases.size(), concurrentCases.size());
+    	logger.error("jsonString:"+jsonString);
+        return jsonString;			
+	}
+	
+	@RequestMapping(value="/getConcurrentCasesDetail.do",params = {"instanceId"})
+	public @ResponseBody String getConcurrentCasesDetail(@RequestParam(value = "instanceId") String instanceId){
+		
+		String jsonString="";
+		logger.debug("getConcurrentCasesDetail - instanceId:" + instanceId);
+		List <ConcurrentCaseRecord> concurrentCaseRecords = xxtxndao.getConcurrentCaseRecords(instanceId);
+		List <ConcurrentTrackerRecord> concurrentTrackerRecords = xxtxndao.getConcurrentTrackerRecords(instanceId);
+		logger.debug("getConcurrentCasesDetail - after query");
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);    	
+    	try {
+			jsonString = mapper.writeValueAsString(concurrentCaseRecords);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString = getDataTableJsonString(jsonString, concurrentCaseRecords.size(), concurrentCaseRecords.size());
+    	logger.debug("getConcurrentCasesDetail - jsonString:" + jsonString);
+        return jsonString;
+	}
+	
+	@RequestMapping(value="/retryCMActivites.do",method=RequestMethod.GET)
+	public @ResponseBody String retryCMActivites(){
+		String jsonString="";
+		
+		int updatedRecords = xxtxndao.retryCMActivities();
+    	
+    	if(updatedRecords>-1){
+    		return "success";
+    	} else{
+    		return "failed";
+    	}
+		
+	}	
+	
+	
+	@RequestMapping(value="/getFailedToSuspendCases.do",method=RequestMethod.GET)
+	public @ResponseBody String getFailedToSuspend(){
+		String jsonString="";
+		
+		List <WorkItem> failedSuspendCases = twprocdao.getFailedToSuspend();
+
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);    	
+    	try {
+			jsonString = mapper.writeValueAsString(failedSuspendCases);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, failedSuspendCases.size(), failedSuspendCases.size());
+    	
+        return jsonString;		
+		
+	}		
+	
+	
+	@RequestMapping(value="/getIssuedLifeErrorCase.do",method=RequestMethod.GET)
+	public @ResponseBody String getIssuedLifeErrorCase(){
+		String jsonString="";
+		
+
+		List <WorkItem> issuedLifeErrorCases = null;
+		List <WorkItem> errorCases = twprocdao.getErrorCases();
+		if (errorCases.size() > 0){
+			
+			String []errorPols = new String[errorCases.size()];
+			int i=0;
+			for(WorkItem errorCase:errorCases){
+				errorPols[i]=errorCase.getPolicy_no();
+				i++;
+			}
+			issuedLifeErrorCases = ciDao.getIssuedLifeCasesByPolicy(errorPols);
+		}		
+
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);    	
+    	try {
+			jsonString = mapper.writeValueAsString(issuedLifeErrorCases);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	if (issuedLifeErrorCases!=null){
+    		jsonString=getDataTableJsonString(jsonString, issuedLifeErrorCases.size(), issuedLifeErrorCases.size());
+    	}else{
+    		jsonString=getDataTableJsonString(jsonString, 0, 0);
+    	}
+    	
+        return jsonString;		
+		
+	}	
+	
+	@RequestMapping(value="/getIssuedHealthErrorCase.do",method=RequestMethod.GET)
+	public @ResponseBody String getIssuedHealthErrorCase(){
+		String jsonString="";
+		
+		List <WorkItem> issuedHealthErrorCases=null;		
+		List <WorkItem> errorCases = twprocdao.getErrorCases();
+		int i=0;		
+		if (errorCases.size() > 0){
+			
+			String []errorPols = new String[errorCases.size()];
+
+			for(WorkItem errorCase:errorCases){
+				errorPols[i]=errorCase.getPolicy_no();
+				i++;				
+			}
+			
+			issuedHealthErrorCases = ciDao.getIssuedHealthCasesByPolicy(errorPols);
+		}		
+
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);    	
+    	try {
+			jsonString = mapper.writeValueAsString(issuedHealthErrorCases);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, issuedHealthErrorCases.size(), issuedHealthErrorCases.size());
+    	
+        return jsonString;		
+		
+	}		
+
+	@RequestMapping(value="/getUnsuspendErrorCase.do",method=RequestMethod.GET)
+	public @ResponseBody String getUnsuspendErrorCase(){
+		String jsonString="";
+		
+		List <ProcSuspendTracker> overdueErrorCases=null;	
+		
+		List <WorkItem> errorCases = twprocdao.getErrorCases();
+
+		int i=0;
+		if (errorCases.size() > 0){
+			
+			String []errorPols = new String[errorCases.size()];
+
+			for(WorkItem errorCase:errorCases){
+				errorPols[i]=errorCase.getPolicy_no();
+				i++;
+			}
+			
+			overdueErrorCases = pstdao.getOverdueErrorCases(errorPols);
+		}		
+
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);    	
+    	try {
+			jsonString = mapper.writeValueAsString(overdueErrorCases);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, overdueErrorCases.size(), overdueErrorCases.size());
+    	
+        return jsonString;		
+		
+	}			
+	
+	
+	@RequestMapping(value="/getCasesFailedToTrigger.do",method=RequestMethod.GET)
+	public @ResponseBody String getCasesFailedToTrigger(){
+		String jsonString="";
+
+    	List <Document> failedTriggerCases = cm400dao.getDocumentsFailedTrigger();
+    	if (failedTriggerCases.size()>0)
+    		failedTriggerCases = filterCaseFailedToTrigger(failedTriggerCases);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);    	
+    	try {
+			jsonString = mapper.writeValueAsString(failedTriggerCases);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, failedTriggerCases.size(), failedTriggerCases.size());
+    	
+        return jsonString;		
+		
+	}
+	
+	
+	
+    @RequestMapping(value="/getDBSessionInfo.do",params = {"dbconnectionname"})
+    public @ResponseBody String getDBSessionInfo(HttpServletRequest request, @RequestParam(value = "dbconnectionname") String dbconnectionname){
+    	
+    	String jsonString="";
+    	
+    	 WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(request.getSession().getServletContext());
+    	
+    	DataSource dt = (DataSource)ctx.getBean("dataSourceTWPROC");
+    	
+    	dbSessionDAO.setDataSource(dt);
+    	DBSessionInfo dbsi = dbSessionDAO.getDBSessionCount();
+    	
+    	List <FlotPieData> pieData=new ArrayList <FlotPieData>(); 
+   	
+    	FlotPieData pieDataPoint = new FlotPieData();
+    	pieDataPoint.setLabel("Active");
+    	pieDataPoint.setData(dbsi.getActive());
+    	pieDataPoint.setColor("red");
+    	pieData.add(pieDataPoint);
+    	
+    	FlotPieData pieDataPoint2 = new FlotPieData();
+    	pieDataPoint2.setLabel("Inactive");
+    	pieDataPoint2.setData(dbsi.getInactive());
+    	pieDataPoint2.setColor("blue");
+    	pieData.add(pieDataPoint2);
+    	
+    	DataSource dt2 = (DataSource)ctx.getBean("dataSourceDSCONFIG");
+    	dbSessionDAO.setDataSource(dt2);
+    	DBSessionInfo dbsi2 = dbSessionDAO.getDBSessionCount();
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	try {
+			jsonString = mapper.writeValueAsString(pieData);
+		}      	
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }  	
+    	
+        return jsonString;
+    }	
+	
+	
+    @RequestMapping(value="/supportQuery.do",method=RequestMethod.GET)
+    public String showForm(){
+        return "supportQuery";
+    }
+
+    @RequestMapping(value="/getUnsuspendCases.do",method=RequestMethod.GET)
+    public @ResponseBody String getUnsuspendCases(){
+    	String jsonString="";
+    	List <ProcSuspendTracker> unsuspendCases = pstdao.getUnsuspendCases();
+    	
+    	if (unsuspendCases.size()>0){
+    		unsuspendCases = filterUnsuspendCases(unsuspendCases);
+    	}
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);    	
+    	try {
+			jsonString = mapper.writeValueAsString(unsuspendCases);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, unsuspendCases.size(), unsuspendCases.size());
+
+        return jsonString;
+    }
+    
+    
+    @RequestMapping(value="/getIndexClass.do",params = {"doctype"})
+    public @ResponseBody String getIndexClass(@RequestParam(value = "doctype") String doctype){
+    	String jsonString="";
+    	List <DocTypeInfo> docTypeInfo = dsConfig.getDocTypeConfigByDocType(doctype);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(docTypeInfo);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, docTypeInfo.size(), docTypeInfo.size());
+    	
+        return jsonString;
+    }
+
+    @RequestMapping(value="/getPolicyHistory.do",params = {"policyno"})
+    public @ResponseBody String getPolicyHistory(@RequestParam(value = "policyno") String policyno){
+    	
+    	String jsonString="";
+    	List <WorkItem> workItemHistory = twprocx.getPolicyHistory(policyno);
+    	
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(workItemHistory);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, workItemHistory.size(), workItemHistory.size());
+    	
+        return jsonString;
+    	
+    }	
+
+    @RequestMapping(value="/getUserRoles.do",params = {"userid"})
+    public @ResponseBody String getUserRoles(@RequestParam(value = "userid") String userid){
+    	
+    	String jsonString="";
+    	List <User> userDetails = userdao.selectUserByUserID(userid);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(userDetails);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, userDetails.size(), userDetails.size());
+    	
+        return jsonString;
+    }   
+    
+    @RequestMapping(value="/getUserRolesByName.do",params = {"name"})
+    public @ResponseBody String getUserRolesByName(@RequestParam(value = "name") String fullName){
+    	
+    	String jsonString="";
+    	List <User> userDetails = userdao.selectUserByFullName(fullName);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(userDetails);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, userDetails.size(), userDetails.size());
+    	
+        return jsonString;
+    }   
+    
+ 
+    @RequestMapping(value="/getRoleThresholds.do",params = {"username"})
+    public @ResponseBody String getRoleThresholds(@RequestParam(value = "username") String username){
+    	
+    	String jsonString="";
+    	List <User> userDetails = userdao.getUserRoleThresholds(username);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(userDetails);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, userDetails.size(), userDetails.size());
+    	
+    	
+        return jsonString;
+    }     
+    
+    @RequestMapping(value="/getIndexClassDesc.do",params = {"ic"})
+    public @ResponseBody String getIndex(@RequestParam(value = "ic") String indexClass){
+    	String jsonString="";
+    	String indexClassDesc = cm400dao.getIndexClassDesc(indexClass);
+    	
+        return indexClassDesc;
+    }  
+    
+    @RequestMapping(value="/searchIndexClass.do",params = {"icdesc"})
+    public @ResponseBody String searchIndexClassByDesc(@RequestParam(value = "icdesc") String indexClassDesc){
+    	
+    	String jsonString="";
+    	List <Document> docClassDetails = cm400dao.getIndexClass(indexClassDesc);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(docClassDetails);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, docClassDetails.size(), docClassDetails.size());
+    	
+        return jsonString;
+    }   
+    
+    
+    @RequestMapping(value="/searchIndexClassById.do",params = {"icid"})
+    public @ResponseBody String searchIndexClassById(@RequestParam(value = "icid") String indexClassid){
+    	
+    	String jsonString="";
+    	List <Document> docClassDetails = cm400dao.getIndexClassById(indexClassid);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(docClassDetails);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, docClassDetails.size(), docClassDetails.size());
+    	
+        return jsonString;
+    }        
+    
+    @RequestMapping(value="/getFailedCases.do",method=RequestMethod.GET)
+    public @ResponseBody String getFailedCases(){
+    	
+    	String jsonString="";
+    	List <WorkItem> failedCases = workitemdao.getFailedCasesList();
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(failedCases);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, failedCases.size(), failedCases.size());
+    	    	
+    	
+        return jsonString;
+    } 
+    
+    
+    @RequestMapping(value="/getErrorCases.do",method=RequestMethod.GET)
+    public @ResponseBody String getErrorCases(){
+    	
+    	String jsonString="";
+    	List <WorkItem> errorCases = twprocdao.getErrorCases();
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);    	
+    	try {
+			jsonString = mapper.writeValueAsString(errorCases);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	jsonString=getDataTableJsonString(jsonString, errorCases.size(), errorCases.size());
+    	
+        return jsonString;
+    }     
+    
+    @RequestMapping(value="/getStuckCases.do",method=RequestMethod.GET)
+    public @ResponseBody String getStuckCases(){
+    	String jsonString="";
+    	List <WorkItem> stuckCases = workitemdao.getStuckCases();
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(stuckCases);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, stuckCases.size(), stuckCases.size());
+    	
+        return jsonString;
+    }   
+    
+    @RequestMapping(value="/getCITransactionsFailed.do",method=RequestMethod.GET)
+    public @ResponseBody String getCITransactionsFailed(){
+    	
+    	String jsonString="";
+    	List <XXTransactionRecord> ciTxnsFailed = xxtxndao.getCITransactionsFailed();
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(ciTxnsFailed);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, ciTxnsFailed.size(), ciTxnsFailed.size());
+    	
+        return jsonString;
+    }   
+    
+    @RequestMapping(value="/getCIHealthTransactionsFailed.do",method=RequestMethod.GET)
+    public @ResponseBody String getCIHealthTransactionsFailed(){
+    	
+    	String jsonString="";
+    	List <XXTransactionRecord> ciHealthTxnsFailed = xxtxndao.getCIHealthTransactionsFailed();
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(ciHealthTxnsFailed);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, ciHealthTxnsFailed.size(), ciHealthTxnsFailed.size());
+    	
+        return jsonString;
+    }      
+        
+    @RequestMapping(value="/getCABTransactionsFailed.do",method=RequestMethod.GET)
+    public @ResponseBody String getCABTransactionsFailed(){
+    	
+    	String jsonString="";
+    	List <XXTransactionRecord> cabTxnsFailed = xxtxndao.getCABTransactionsFailed();
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(cabTxnsFailed);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, cabTxnsFailed.size(), cabTxnsFailed.size());
+    	
+        return jsonString;
+    }   
+    
+    
+    @RequestMapping(value="/getPendingTrackingGroupTransfer.do",method=RequestMethod.GET)
+    public @ResponseBody String getPendingTrackingGroupTransfer(){
+    	
+    	String pendingCount="0";
+    	int pendCount = twprocdao.getPendingTrackingGroupRecordTransfer();
+    	pendingCount = new Integer(pendCount).toString();
+    	
+        return pendingCount;
+    }      
+
+    @RequestMapping(value="/getCPFDRTransactionsFailed.do",method=RequestMethod.GET)
+    public @ResponseBody String getCPFDRTransactionsFailed(){
+    	
+    	String jsonString="";
+    	List <XXTransactionRecord> cpfdrTxnsFailed = xxtxndao.getCPFDRTransactionsFailed();
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(cpfdrTxnsFailed);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, cpfdrTxnsFailed.size(), cpfdrTxnsFailed.size());
+    	
+        return jsonString;
+    }    
+    
+    @RequestMapping(value="/getFOCETransactionsFailed.do",method=RequestMethod.GET)
+    public @ResponseBody String getFOCETransactionsFailed(){
+    	
+    	String jsonString="";
+    	List <XXTransactionRecord> foceTxnsFailed = xxtxndao.getFOCETransactionsFailed();
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(foceTxnsFailed);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, foceTxnsFailed.size(), foceTxnsFailed.size());
+    	
+        return jsonString;
+    }       
+
+    
+    @RequestMapping(value="/getPPRTransactionsFailed.do",method=RequestMethod.GET)
+    public @ResponseBody String getPPRTransactionsFailed(){
+    	
+    	String jsonString="";
+    	List <XXTransactionRecord> pprTxnsFailed = xxtxndao.getPPRTransactionsFailed();
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(pprTxnsFailed);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, pprTxnsFailed.size(), pprTxnsFailed.size());
+    	
+        return jsonString;
+    }       
+    
+    @RequestMapping(value="/getLATransactionsFailed.do",method=RequestMethod.GET)
+    public @ResponseBody String getLATransactionsFailed(){
+    	
+    	String jsonString="";
+    	List <XXTransactionRecord> laTxnsFailed = xxtxndao.getLALCATransactionsFailed();
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(laTxnsFailed);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, laTxnsFailed.size(), laTxnsFailed.size());
+    	
+        return jsonString;
+    }       
+ 
+    @RequestMapping(value="/getCMActivitiesFailed.do",method=RequestMethod.GET)
+    public @ResponseBody String getCMActivitiesFailed(){
+    	
+    	String jsonString="";
+    	List <CMActivity> cmActivitiesFailed = xxtxndao.getFailedCMActivities();
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(cmActivitiesFailed);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, cmActivitiesFailed.size(), cmActivitiesFailed.size());
+    	
+        return jsonString;
+    }      
+    
+    
+    
+    @RequestMapping(value="/getITExceptionCases.do",method=RequestMethod.GET)
+    public @ResponseBody String getITExceptionCases(){
+    	String jsonString="";
+    	List <WorkItem> itExceptionCases = workitemdao.getExceptionCases();
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(itExceptionCases);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, itExceptionCases.size(), itExceptionCases.size());
+    	
+        return jsonString;
+    }     
+    
+    
+    private String getDataTableJsonString(String jsonObjectConversion, int totalRecords, int displayRecords){
+    	String jsonString="";
+    	
+    	jsonString = "{\"sEcho\": 3, \"iTotalRecords\": "+totalRecords+", \"iTotalDisplayRecords\": "+displayRecords +","
+    			+ "\"aaData\": " + jsonObjectConversion + "}";    	
+    	
+    	return jsonString;
+    	
+    }
+    
+    
+    private List <Document> filterCaseFailedToTrigger(List <Document> listCasesFailedTrigger){
+    	
+    	List <Document> filterListCasesFailedTrigger = new ArrayList <Document>(); 
+    	
+    	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    	Date date = new Date();
+    	String dtString = dateFormat.format(date);
+    	
+    	for (Document d:listCasesFailedTrigger){
+    		String cmtimestampconcat = d.getCMTimeStamp().substring(0, 10);
+    		if (d.getProcessIndicator().contains("!9")){
+    			filterListCasesFailedTrigger.add(d);
+    		} else if (cmtimestampconcat.contains(dtString.trim())){
+    			;
+    		} else {
+    			filterListCasesFailedTrigger.add(d);
+    		}
+    	}
+    	
+    	return filterListCasesFailedTrigger;
+    }
+    
+    private List <ProcSuspendTracker> filterUnsuspendCases(List <ProcSuspendTracker> listUnsuspendCases){
+    	
+    	List <ProcSuspendTracker> filterlistUnsuspendCases = new ArrayList <ProcSuspendTracker>(); 
+    	
+    	DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+    	Date date = new Date();
+    	String todayString = dateFormat.format(date);
+    	
+    	for (ProcSuspendTracker p:listUnsuspendCases){
+    		if (p.getCreateDate().startsWith(todayString)){
+    			;
+    		} else {
+    			filterlistUnsuspendCases.add(p);
+    		}
+    	}
+    	
+    	return filterlistUnsuspendCases;
+    }    
+    
+        
+    @RequestMapping(value="/getInstanceLastTask1.do",params = {"instanceid"})
+    public @ResponseBody String getInstanceLastTask1(@RequestParam(value = "instanceid") String instanceid){
+    	
+    	String jsonString="";
+    	
+    	List <WorkItem> instanceTasks = twprocdao.getInstanceLastTaskByInstanceId(instanceid);
+
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(instanceTasks);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, instanceTasks.size(), instanceTasks.size());
+    	
+    	
+        return jsonString;
+    	
+    }
+    
+    @RequestMapping(value="/getInstanceLastTask2.do",params = {"policyno"})
+    public @ResponseBody String getInstanceLastTask2(@RequestParam(value = "policyno") String policyno){
+    	
+    	String jsonString="";
+    	List <WorkItem> instanceTasks = twprocdao.getInstanceLastTaskByPolicyNo(policyno);
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(instanceTasks);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, instanceTasks.size(), instanceTasks.size());
+    	
+        return jsonString;
+    	
+    }
+    
+
+      @RequestMapping(value="/getWfComments.do",params = {"searchid","searchmode"})
+     public @ResponseBody String getWfComments(@RequestParam(value = "searchid") String searchid,@RequestParam(value = "searchmode") String searchmode){
+    	String taskId="";
+    	String wfComments="";
+    	List <WorkItem> instanceTasks = null;
+    	if(searchmode.equals("1")){
+    		instanceTasks = twprocdao.getInstanceLastTaskByInstanceId(searchid);
+    	}else if(searchmode.equals("2")){
+    		instanceTasks = twprocdao.getInstanceLastTaskByPolicyNo(searchid);
+    	}
+    	for (WorkItem i:instanceTasks){
+    		taskId = i.getTask_id().toString();
+    		
+    	}
+
+    	wfComments=bpmInterface.getWfComments(taskId);
+    	
+        return wfComments;
+    }	
+    
+    
+    
+    @RequestMapping(value="/getInstanceVariables.do",params = {"instanceid"})
+    public @ResponseBody String getInstanceVariables(@RequestParam(value = "instanceid") String instanceid){
+    	
+    	String jsonString="";
+    	List <WorkItem> instanceVariables = twprocdao.getInstanceVariables(instanceid);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(instanceVariables);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, instanceVariables.size(), instanceVariables.size());
+    	
+    	
+        return jsonString;
+    	
+    }	
+    
+    //Finish Task
+	@RequestMapping(value="/finishTask.do",params = {"taskId","paramVal"})
+	public @ResponseBody String finishTask(@RequestParam(value = "taskId") String taskId, @RequestParam(value = "paramVal") String paramVal){
+		int resumedCount = 0;
+			if (!taskId.equalsIgnoreCase("")){
+				try{
+					bpmInterface.finishTask(taskId,paramVal);
+					resumedCount++;
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+		}
+			
+			return String.valueOf(resumedCount);
+	}   
+	
+	//Resume Process
+	@RequestMapping(value="/resumeProcess.do",params = {"instanceId"})
+	public @ResponseBody String resumeProcess(@RequestParam(value = "instanceId") String instanceId){
+		int resumedCount = 0;
+			if (!instanceId.equalsIgnoreCase("")){
+				try{
+					bpmInterface.resumeProcess(instanceId);
+					resumedCount++;
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+		}
+			
+			return String.valueOf(resumedCount);
+	} 
+	
+	//Suspend Process
+	@RequestMapping(value="/suspendProcess.do",params = {"instanceId"})
+	public @ResponseBody String suspendProcess(@RequestParam(value = "instanceId") String instanceId){
+		int resumedCount = 0;
+			if (!instanceId.equalsIgnoreCase("")){
+				try{
+					bpmInterface.suspendProcess(instanceId);
+					resumedCount++;
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+		}
+			
+			return String.valueOf(resumedCount);
+	} 
+	
+/*	//Terminate Process
+	@RequestMapping(value="/terminateProcess.do",params = {"instanceId"})
+	public @ResponseBody String terminateProcess(@RequestParam(value = "instanceId") String instanceId){
+		int resumedCount = 0;
+			if (!instanceId.equalsIgnoreCase("")){
+				try{
+					bpmInterface.terminateProcess(instanceId);
+					resumedCount++;
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+		}
+			
+			return String.valueOf(resumedCount);
+	}*/
+	
+	//Terminate Process
+	@RequestMapping(value="/terminateProcess.do",params = {"instanceId"})
+	public @ResponseBody String terminateProcess(@RequestParam(value = "instanceId") String instanceId){
+		int resumedCount = 0;
+			if (!instanceId.equalsIgnoreCase("")){
+				try{
+					
+					String[] instIds = instanceId.split(",");
+					int a;
+					for (a=0;a<instIds.length;a++){
+						instanceId=instIds[a];
+						bpmInterface.terminateProcess(instanceId);
+						resumedCount=a;
+					}
+
+					
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+		}
+			
+			return String.valueOf(resumedCount);
+	}
+	
+	//Decision Audit
+	@RequestMapping(value="/getDecisionAudit.do",params = {"policyNo"})
+	public @ResponseBody String getDecisionAudit(@RequestParam(value = "policyNo") String policyNo){
+    	String jsonString="";
+    	List <DecisionAuditItem> workItemHistory = dsConfig.getDecisionAudit(policyNo);
+    	
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(workItemHistory);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, workItemHistory.size(), workItemHistory.size());
+    	
+        return jsonString;
+	}
+	
+	//Decision Audit
+	@RequestMapping(value="/getUserAuditHistory.do",params = {"username"})
+	public @ResponseBody String getUserAuditHistory(@RequestParam(value = "username") String userName){
+    	String jsonString="";
+    	LinkedList <DecisionAuditItem> workItemHistory = dsConfig.getUserAuditHistory(userName);
+    	
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(workItemHistory);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, workItemHistory.size(), workItemHistory.size());
+
+        return jsonString;
+	}
+	
+	@RequestMapping(value="/deleteRecordsAIS.do",params = {"policyNo"})
+	public @ResponseBody String deleteRecordsAIS(@RequestParam(value = "policyNo") String policyNo){
+		
+		policyNo = policyNo.replaceAll(" ", ",");
+
+		String command = null;
+		String result = "failed";
+		try{
+			InetAddress inetAddress = InetAddress.getLocalHost();
+			String hostName = inetAddress.getHostName();
+			logger.debug("AIS Hostname: " + hostName);
+			String diskDrive = "E:";
+			if(hostName.equalsIgnoreCase("SGLFCMICCPRD") || hostName.equalsIgnoreCase("SGLFCMICCUAT") || hostName.equalsIgnoreCase("SGLFCMICCDEV"))
+			{
+				diskDrive = "D:";
+			}
+				
+			Authenticator.setDefault(authenticator);
+		
+			if(authenticator.getBpmServer().equalsIgnoreCase("SGPPS39")){
+				command=diskDrive+"/AIS/ais_delete_prod.bat";
+				}
+			if(authenticator.getBpmServer().equalsIgnoreCase("SGPPS35")){
+				command=diskDrive+"/AIS/ais_delete_uat.bat";
+			}
+		
+			logger.debug("deleteRecordsAIS Command = " + command);
+		
+			ProcessBuilder builder;
+			BufferedReader br = null;
+			StringBuffer sb = new StringBuffer();
+			String line = null;
+		
+			String[] policies = policyNo.split(",");
+			int a;
+			for (a=0;a<policies.length;a++){
+				policyNo=policies[a];
+				builder = new ProcessBuilder(command,policyNo.trim());
+				builder.directory(new File(diskDrive+"\\AIS\\"));
+				logger.debug("" + builder.directory());
+				builder.redirectErrorStream(true);
+				Process p = builder.start();
+			
+				p.waitFor();
+
+				br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+				if(a == 0){
+				 sb.append("<b>Output logs:</b><br>");
+					}
+		   
+				while ((line = br.readLine()) != null) {
+					sb.append(line+"<br>");
+				}
+
+				br.close();
+				result=sb.toString();
+			}
+		}catch(Exception ex){
+			result="Fail to delete policy records in AIS.";
+			ex.printStackTrace();
+		}
+		
+    	
+        return result;		
+	}
+	
+
+	@RequestMapping(value="/getActiveSuspendRec.do",params = {"policyNo"})
+	public @ResponseBody String getActiveSuspendRec(@RequestParam(value = "policyNo") String policyNo){
+    	String jsonString="";
+    	List <ProcSuspendTracker> procSuspendTracker = pstdao.getActiveSuspendRec(policyNo);
+    	
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(procSuspendTracker);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, procSuspendTracker.size(), procSuspendTracker.size());
+    	
+        return jsonString;
+	}
+	
+	
+	@RequestMapping(value="/getActiveInstance.do",params = {"policyNo"})
+	public @ResponseBody String getActiveInstance(@RequestParam(value = "policyNo") String policyNo){
+    	String jsonString="";
+    	List <WorkItem> workItem = twprocdao.getActiveInstance(policyNo);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(workItem);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, workItem.size(), workItem.size());
+    	
+        return jsonString;
+	}
+
+	
+	@RequestMapping(value="/deleteSuspendRec.do",params = {"policyNo"})
+	public @ResponseBody String deleteSuspendRec(@RequestParam(value = "policyNo") String policyNo){
+    	int returnCount = pstdao.deleteSuspendRec(policyNo);
+    	
+        return String.valueOf(returnCount);		
+		
+	}
+	
+	
+	//Terminate Process
+/*	@RequestMapping(value="/terminateInstance.do",params = {"policyNo"})
+	public @ResponseBody String terminateInstance(@RequestParam(value = "policyNo") String policyNo){
+		int resumedCount = 0;
+		String instanceId=twprocdao.getActiveInstanceId(policyNo);
+		
+			if (!instanceId.equalsIgnoreCase("")){
+				try{
+					bpmInterface.terminateProcess(instanceId);
+					resumedCount++;
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+		}
+			
+			return String.valueOf(resumedCount);
+	}*/
+	
+	
+	@RequestMapping(value="/terminateInstance.do",params = {"policyNo"})
+	public @ResponseBody String terminateInstance(@RequestParam(value = "policyNo") String policyNo){
+		
+		logger.error("inside terminateInstance");
+		int resumedCount = 0;
+		policyNo = policyNo.replaceAll(" ", ",");
+		logger.error("Instance Ids to terminate: " + policyNo);
+			if (!policyNo.equalsIgnoreCase("")){
+				try{
+					
+					String[] instIds = policyNo.split(",");
+					int a;
+					logger.error("instIds[] = " + instIds);
+					for (a=0;a<instIds.length;a++){
+						policyNo=instIds[a];
+						logger.error("instanceId/PolicyNo = " + policyNo);
+						bpmInterface.terminateProcess(policyNo);
+						resumedCount=a;
+					}
+
+					
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+		}
+			
+			return String.valueOf(resumedCount);
+	}
+	
+	
+	@RequestMapping(value="/retryFailedTriggerCases.do",method=RequestMethod.GET)
+	public @ResponseBody String retryFailedTriggerCases(){
+		
+		int returnCount = cm400dao.retriggerFailedCases();
+    	
+    	StringBuffer sb= new StringBuffer();
+	    sb.append("<b>Output logs:</b><br>");
+    	sb.append("Number of retriggered cases: " + returnCount);
+    	
+    	if(returnCount>-1){
+    		return "success";
+    	} else{
+    		return "failed";
+    	}
+		
+	}
+	
+	
+	
+    @RequestMapping(value="/getExceptionWebFormCases.do",method=RequestMethod.GET)
+    public @ResponseBody String getExceptionWebFormCases(){
+    	String jsonString="";
+    	List <XXTransactionRecord> exceptionWFCases = xxtxndao.getExceptionWebFormCases();
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(exceptionWFCases);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, exceptionWFCases.size(), exceptionWFCases.size());
+    	
+        return jsonString;
+    }     
+	
+    
+    @RequestMapping(value="/getMissedOutTWPROCXArchive.do",method=RequestMethod.GET)
+    public @ResponseBody String getMissedOutTWPROCXArchive(){
+    	String jsonString="";
+    	List <WorkItem> missedOutTWPROCXArchive = twprocx.getMissedOutTWPROCXArchive();
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(missedOutTWPROCXArchive);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, missedOutTWPROCXArchive.size(), missedOutTWPROCXArchive.size());
+    	
+        return jsonString;
+    }
+    
+    @RequestMapping(value="/getBOInputOutputMsgByPN.do",params = {"policyNo"})
+    public @ResponseBody String getBOInputOutputMsgByPN(String policyNo){
+    	
+    	String jsonString="";
+    	List <XXTransactionRecord> boInputOutputMsg = xxtxndao.getBOInputOutputMsgByPN(policyNo);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(boInputOutputMsg);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, boInputOutputMsg.size(), boInputOutputMsg.size());
+    	
+        return jsonString;
+    }
+    
+    @RequestMapping(value="/getBOInputOutputMsgByCorrId.do",params = {"corrId"})
+    public @ResponseBody String getBOInputOutputMsgByCorrId(String corrId){
+    	
+    	String jsonString="";
+    	List <XXTransactionRecord> boInputOutputMsg = xxtxndao.getBOInputOutputMsgByCorrId(corrId);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(boInputOutputMsg);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, boInputOutputMsg.size(), boInputOutputMsg.size());
+    	
+        return jsonString;
+    }  
+    
+    
+    @RequestMapping(value="/getAISReqRespMsgByPN.do",params = {"policyNo"})
+    public @ResponseBody String getAISReqRespMsgByPN(String policyNo){
+    	
+    	String jsonString="";
+    	List <XXTransactionRecord> aisInputOutputMsg = xxtxndao.getAISReqRespMsgByPN(policyNo);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(aisInputOutputMsg);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, aisInputOutputMsg.size(), aisInputOutputMsg.size());
+
+        return jsonString;
+    }
+    
+    @RequestMapping(value="/getAISReqRespMsgByCorrId.do",params = {"corrId"})
+    public @ResponseBody String getAISReqRespMsgByCorrId(String corrId){
+    	
+    	String jsonString="";
+    	List <XXTransactionRecord> aisInputOutputMsg = xxtxndao.getAISReqRespMsgByCorrId(corrId);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(aisInputOutputMsg);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, aisInputOutputMsg.size(), aisInputOutputMsg.size());
+    	
+        return jsonString;
+    }
+	
+    @RequestMapping(value="/getWebFormTransByUserID.do",params = {"userid"})
+    public @ResponseBody String getWebFormTransByUserID(@RequestParam(value = "userid") String userId){
+    	
+    	String jsonString="";
+    	List <XXTransactionRecord> webFormRecords = xxtxndao.getWebFormTransByUserID(userId);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(webFormRecords);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, webFormRecords.size(), webFormRecords.size());
+    	
+        return jsonString;
+    } 
+    
+    @RequestMapping(value="/getWebFormTransByPN.do",params = {"policyno"})
+    public @ResponseBody String getWebFormTransByPN(@RequestParam(value = "policyno") String policyNo){
+    	
+    	String jsonString="";
+    	List <XXTransactionRecord> webFormRecords = xxtxndao.getWebFormTransByPN(policyNo);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(webFormRecords);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, webFormRecords.size(), webFormRecords.size());
+    	
+        return jsonString;
+    } 
+    
+    
+	@RequestMapping(value="/updateIndexClassInCMActivities.do",params = {"policyNo","indexClass"})
+	public @ResponseBody String updateIndexClassInCMActivities(@RequestParam(value = "policyNo") String policyNo, @RequestParam(value = "indexClass") String indexClass){
+    	int returnCount = xxtxndao.updateIndexClassInCMActivities(policyNo,indexClass);
+    	
+        return String.valueOf(returnCount);		
+		
+	}
+	
+	@RequestMapping(value="/webFormExceptionMarkResolved.do",params = {"refkeys"})
+	public @ResponseBody String webFormExceptionMarkResolved(@RequestParam(value = "refkeys") String refKeys){
+		
+		int returnCount = 0;
+		String refKeyList[] = refKeys.split(",");
+		for (String refKey:refKeyList){
+			if (!refKey.equalsIgnoreCase("")){
+				try{
+					returnCount = xxtxndao.markResolvedWebFormException(refKey);
+					returnCount++;
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return String.valueOf(returnCount);
+	}
+	
+    @RequestMapping(value="/getCaseDataTrackerRecords.do",params = {"policyno"})
+    public @ResponseBody String getCaseDataTrackerRecords(@RequestParam(value = "policyno") String policyno){
+    	
+    	String jsonString="";
+    	List <XXTransactionRecord> caseDataTrackerRecords = xxtxndao.getCaseDataTrackerRecords(policyno);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(caseDataTrackerRecords);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, caseDataTrackerRecords.size(), caseDataTrackerRecords.size());
+    	
+        return jsonString;
+    	
+    }
+    
+	@RequestMapping(value="/retryFoceCase.do",params = {"policyNos"})
+	public @ResponseBody String retryFoceCase(@RequestParam(value = "policyNos") String policyNos){
+		
+		int returnCount = 0;
+		String policyNoList[] = policyNos.split(",");
+		for (String policyNo:policyNoList){
+			if (!policyNo.equalsIgnoreCase("")){
+				try{
+					returnCount = xxtxndao.retryFoceCase(policyNo);
+					returnCount++;
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return String.valueOf(returnCount);
+	}
+	
+	@RequestMapping(value="/retryLaLCaCase.do",params = {"contractNumbers"})
+	public @ResponseBody String retryLaLCaCase(@RequestParam(value = "contractNumbers") String contractNumbers){
+		int returnCount = 0;
+		String contractNumberList[] = contractNumbers.split(",");
+		for (String contractNumber:contractNumberList){
+			if (!contractNumber.equalsIgnoreCase("")){
+				try{
+					returnCount = xxtxndao.retryLalCaCase(contractNumber);
+					returnCount++;
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return String.valueOf(returnCount);
+	}
+	
+	@RequestMapping(value="/ntuExceptionMarkResolved.do",params = {"policyNos"})
+	public @ResponseBody String ntuExceptionMarkResolved(@RequestParam(value = "policyNos") String policyNos){
+		int returnCount = 0;
+		String policyNoList[] = policyNos.split(",");
+		for (String policyNo:policyNoList){
+			if (!policyNo.equalsIgnoreCase("")){
+				try{
+					returnCount = xxtxndao.ntuExceptionMarkResolved(policyNo);
+					returnCount++;
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return String.valueOf(returnCount);
+	}
+	
+	
+	@RequestMapping(value="/failedCaseMarkResolved.do",params = {"instanceIds"})
+	public @ResponseBody String failedCaseMarkResolved(@RequestParam(value = "instanceIds") String instanceIds){
+		int returnCount = 0;
+		String instanceIdList[] = instanceIds.split(",");
+		for (String instanceId:instanceIdList){
+			if (!instanceId.equalsIgnoreCase("")){
+				try{
+					returnCount = twprocdao.failedCaseMarkResolved(instanceId);
+					returnCount++;
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return String.valueOf(returnCount);
+	}
+	
+	
+	@RequestMapping(value="/resumeUnsuspendCases.do",params = {"instanceIds"})
+	public @ResponseBody String resumeUnsuspendCases(@RequestParam(value = "instanceIds") String instanceIds){
+		
+		int resumedCount = 0;
+		logger.debug("Resuming Unsuspend cases : " + instanceIds);
+		
+		String instanceIdArray[] = instanceIds.split(",");
+		
+		for (String instanceId:instanceIdArray){
+			if (!instanceId.equalsIgnoreCase("")){
+				try{
+					String latestTask = twprocdao.getLatestActiveTask(instanceId).toString();
+					bpmInterface.completeCase(latestTask, null);
+					resumedCount++;
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return String.valueOf(resumedCount);
+		
+		
+	}
+	
+	
+	@RequestMapping(value="/markUnsuspendCasesAsResolved.do",params = {"instanceIds"})
+	public @ResponseBody int markUnsuspendCasesAsResolved(@RequestParam(value = "instanceIds") String instanceIds){
+		
+		int result = 0;
+		
+		String instanceIdArray[] = instanceIds.split(",");
+		
+		for (String instanceId:instanceIdArray){
+			if (!instanceId.equalsIgnoreCase("")){
+				try{
+					result =  pstdao.markUnsuspendCaseAsResolved(instanceId);
+					result++;
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return result;
+		
+		
+	}
+	
+	@RequestMapping(value="/deleteAISLandingRecord.do",params = {"policyNo"})
+	public @ResponseBody String deleteAISLandingRecord(@RequestParam(value = "policyNo") String policyNo){
+    	int returnCount = xxtxndao.deleteAISLandingRecord(policyNo);
+    	
+        return String.valueOf(returnCount);		
+		
+	}
+	
+	
+    @RequestMapping(value="/trackPolicyInstance.do",params = {"instanceid"})
+    public @ResponseBody String trackPolicyInstance(@RequestParam(value = "instanceid") String instanceid){
+    	
+    	String jsonString="";
+    	List <WorkItem> policyInstance = twprocdao.trackPolicyInstance(instanceid);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(policyInstance);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, policyInstance.size(), policyInstance.size());
+    	
+    	
+        return jsonString;
+    	
+    }	
+    
+    
+	@RequestMapping(value="/resendBOMessage.do",params = {"corrIds"})
+	public @ResponseBody int resendBOMessage(@RequestParam(value = "corrIds") String corrIds){
+		
+		int result = 0;
+		String corrIdArray[] = corrIds.split(",");
+		for (String corrId:corrIdArray){
+			if (!corrId.equalsIgnoreCase("")){
+				try{
+					result =  pstdao.resendBOMessage(corrId);
+					result++;
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return result;
+		
+		
+	}
+	
+	
+    @RequestMapping(value="/getUserDSSearch.do",params = {"userid"})
+    public @ResponseBody String getUserDSSearch(@RequestParam(value = "userid") String userid){
+    	
+    	String jsonString="";
+    	List <WorkItem> workItem = dsConfig.getUserDSSearch(userid);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(workItem);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, workItem.size(), workItem.size());
+    	
+        return jsonString;
+    }   
+    
+    
+	@RequestMapping(value="/addUserDSSearch.do",params = {"fromUserId","toUserId","dsSearch"})
+	public @ResponseBody String addUserDSSearch(@RequestParam(value = "fromUserId") String fromUserId, @RequestParam(value = "toUserId") String toUserId, @RequestParam(value = "dsSearch") String dsSearch){
+		String []selectedDSSearch = dsSearch.split(";");
+		String outputMessage="";
+		
+		for (String dsSearchStr:selectedDSSearch){
+
+			try {
+				int newDSSearchId=dsConfig.getNewDSSearchId();
+				
+				WorkItem workItem = dsConfig.getUserDSSearchDtl(fromUserId,dsSearchStr);
+				dsConfig.insertUserDSSearchDtl(workItem,toUserId,dsSearchStr,newDSSearchId);
+				
+				outputMessage+="Successfully added " + dsSearchStr + " <br>";
+				addUserDSSearchColMapping(workItem.getQuery_id(), newDSSearchId);
+			} catch (Exception e){
+				outputMessage+="<div style='color:red'>Failed to add " + dsSearchStr + " </div><br>";
+			}
+		}
+		logger.debug(outputMessage);
+		return outputMessage;
+		
+		
+	}
+	
+	public @ResponseBody String addUserDSSearchColMapping(BigDecimal fromDSQueryId, int newDSSearchId){
+		String outputMessage="";
+			try {
+				logger.debug("fromDSQueryId: " + fromDSQueryId);
+				List <WorkItem> workItem= dsConfig.getDSSearchColumnMapping(fromDSQueryId);
+				
+				for(int a=0;a<workItem.size();a++){
+					WorkItem wi = workItem.get(a);
+					dsConfig.insertUserDSSearchColMapping(wi,newDSSearchId);
+				}
+				
+				outputMessage="Successfully added ";
+
+			} catch (Exception e){
+				e.printStackTrace();
+			}
+	
+		return outputMessage;
+	}
+	
+	
+    @RequestMapping(value="/getUserCMRoles.do",params = {"userid"})
+    public @ResponseBody String getUserCMRoles(@RequestParam(value = "userid") String userid){
+    	
+    	String jsonString="";
+    	List <Document> userCMRolesDetails = cm400dao.getRolesByUserID(userid);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(userCMRolesDetails);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, userCMRolesDetails.size(), userCMRolesDetails.size());
+    	
+        return jsonString;
+    } 
+    
+    @RequestMapping(value="/getGroupCMAccessControlList.do",params = {"txtCMGroupName","txtAccessControlName"})
+    public @ResponseBody String getGroupCMAccessControlList(@RequestParam(value = "txtCMGroupName") String txtCMGroupName,
+    		@RequestParam(value = "txtAccessControlName") String txtAccessControlName){
+    	String jsonString="";
+    	List <Document> groupCMAccessControlList = cm400dao.getGroupCMAccessControlList(txtCMGroupName,txtAccessControlName);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(groupCMAccessControlList);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, groupCMAccessControlList.size(), groupCMAccessControlList.size());
+    	
+        return jsonString;
+    } 
+    
+    
+    @RequestMapping(value="/getGroupCMAccessControlList.do",params = {"indexClassName"})
+    public @ResponseBody String getGroupCMAccessControlList(@RequestParam(value = "indexClassName") String indexClassName){
+    	String jsonString="";
+    	List <Document> groupCMAccessControlList = cm400dao.getGroupCMAccessControlList(indexClassName);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(groupCMAccessControlList);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, groupCMAccessControlList.size(), groupCMAccessControlList.size());
+    	
+        return jsonString;
+    }
+    
+    @RequestMapping(value="/getUserDSSearchQueries.do",params = {"userid"})
+    public @ResponseBody String getUserDSSearchQueries(@RequestParam(value = "userid") String userid) {
+
+    	String jsonString="";
+    	List <DSSearchQuery> searchQueryList = dsConfig.getUserSearchQueries(userid);
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+    	mapper.disable(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS);
+    	try {
+			jsonString = mapper.writeValueAsString(searchQueryList);
+		}     
+    	catch (JsonParseException e) { e.printStackTrace();}
+        catch (JsonMappingException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace(); }
+    	
+    	jsonString=getDataTableJsonString(jsonString, searchQueryList.size(), searchQueryList.size());
+        return jsonString;
+    }   
+    
+    @RequestMapping(value="/addUserSelectedDSSearchQueries.do",params = {"userfrom","userto","searchids"})
+    public @ResponseBody String addUserSelectedDSSearchQueries(@RequestParam(value = "userfrom") String userfrom, @RequestParam(value = "userto") String userto, @RequestParam(value = "searchids") String searchids) {
+
+    	StringBuilder outputMessage = new StringBuilder("<div style='color:lightgray'>Added From "+userfrom+" To "+userto+"</div><br>");
+    	String ids[] = searchids.split(",");		
+		for (String id : ids){
+			try {				
+				String newCreatedId = dsConfig.insertUserSearchQuery(userto,id);
+				int rowsCreated = dsConfig.insertUserSearchQueryColumnMapping(id, newCreatedId);
+			} catch (Exception e){
+				outputMessage.append("<div style='color:red'>Failed to add " + id + " </div><br>");
+			}
+		}
+		logger.debug(outputMessage.toString());
+		return outputMessage.toString();
+	}
+}
