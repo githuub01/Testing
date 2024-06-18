@@ -1,0 +1,142 @@
+
+Conversation opened. 1 read message. 
+
+Skip to content
+Using Gmail with screen readers
+sudhakar 
+31 of 38
+New material: "useReducer"
+Inbox
+
+Sudhakar Sharma (Classroom) <no-reply@classroom.google.com>
+Fri, 2 Feb, 08:55
+to me
+
+
+Classroom Logo
+''	Notification settings
+REACT012024 React 7:30 AM	''
+NEW MATERIAL
+
+useReducer
+- useReducer manages operations using following components
+    a) Store
+    b) State
+    c) Reducer
+    d) Actions
+
+- Store is the location where centralized data is kept.
+- State is used by component to access the data from store and render in UI.
+- Reducer defines the actions and state.
+- Actions specify when the store need to update.
+
+Syntax:
+1. Configure a store globally with initial state.
+
+       let  initialState = {usersCount : 0 };        => store
+
+2. Configure a reducer, which is a function that comprises of state and actions.
+
+      function reducer(state, action)
+      {
+          switch(action.type)
+          {
+            case "join":
+            return  { usersCount: state.usersCount + 1 }
+            case "exit":
+            return  { userCount: state.usersCount - 1 }
+          }
+      }
+
+
+3. A component can access the store and use the actions from reducer by using a hook
+        "useReducer()"
+
+    const [state, dispatch] = useReducer(reducer, initialState);
+
+
+4. Dispatch actions on various events
+
+     function JoinClick(){
+        dispatch({type:"join"})                { state.usersCount }
+     }
+
+    functon ExitClick(){
+           dispatch({type:"exit"})                { state.usersCount }
+    }
+
+Ex:
+import { useReducer } from "react";
+
+let initialState = {usersCount: 0};
+
+function reducer(state, action){
+    switch(action.type){
+        case "join":
+        console.log();
+        return {usersCount: state.usersCount + 1};
+        case "exit":
+        return {usersCount: state.usersCount - 1};
+    }
+}
+
+export function ReducerDemo(){
+
+
+    const [state, dispatch] = useReducer(reducer, initialState);
+
+    function handleJoinClick(){
+        dispatch({type: 'join'});
+    }
+    function handleExitClick(){
+        dispatch({type:'exit'});
+    }  
+
+    return(
+        <div className="container-fluid d-flex justify-content-center">
+            <div className="card p-2 m-4 w-50">
+                <div className="card-header text-center">
+                    <h4>React JS Live</h4>
+                    <p>Live Users : {state.usersCount} </p>
+                </div>
+                <div className="card-body">
+                    <iframe src="https://www.youtube.com/embed/tm7kVn8abSg&quot; width="100%" height="300" />
+                </div>
+                <div className="card-footer text-center">
+                    <button onClick={handleJoinClick} className="btn btn-primary me-2">Join</button>
+                    <button onClick={handleExitClick} className="btn btn-danger">Exit</button>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+                        React Class Components
+
+- Class is a program template that provides sample data and logic, which you can implement and customize according to the requirements.
+
+Issues with OOP:
+- It doesn't support low level features.
+- It can't directly interact with hardware services.
+- It uses more memory.
+- It is slow.
+
+- Class components
+    * Have built-in state (without explicit state configuration it can manage data)
+    * Easy to extend.
+    * Losely coupled architecture.
+   
+Concepts:
+- Class Members
+    a) Property
+    b) Method
+    c) Accessor
+    d) Constructor
+- Inheritance
+- Polymorphism
+- Module System
+See details
+Posted on 8:54 am, Feb 2 (IST) by Sudhakar Sharma
+Google logoGoogle LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA
+This email was sent to you because you indicated that you'd like to receive email notifications from Google Classroom. If you don't want to receive emails like this, you can unsubscribe or change your settings.
+sudhakar. Press Tab to insert.

@@ -1,0 +1,152 @@
+Formik
+- Formik provides "useFormik()" hook to configure form and handle interactions.
+
+    let formik = useFormik({
+        initialValues: { }
+        onSubmit : () => { }
+        validate : ()=> { }
+        validationSchema: { }
+    })
+
+- initialValues : configure the values that a form have to handle.
+             These values are mapped to form elements.
+             They can access the store the new value and bind the initial value.
+
+    <input type="text" name="UserName" onChange={formik.handleChange} />
+    <select name="City" onChange={formik.handleChange} />
+
+ Note: Every formik element must have "name" attribute mapping to initialValues.
+
+- onSubmit  :  It is a function that handles form "onSubmit" event.
+               It can collect the form values and submit to server.
+               All form elements values are returned as "object".
+
+     <form  onSubmit={formik.handleSubmit}> </form>
+
+      onSubmit : (values) => { 
+        // submit to server
+       }
+
+
+                          Form Validation
+
+- Validation is the process of verifying user input.
+- Validation is required to ensure that contradictionary and unauthorized data is not get stored into data base.
+- Formik handles client side validations.
+- Formik validates by using traditional JavaScript functions and logic.
+- Formik requires a validation function to return errors object.
+
+        function  ValidateForm(formdata)
+        {
+             var errors = { Field: ' ', Field: ' ' };
+
+              // logic for validating form data
+
+             returns errors;
+        }
+
+- Formik can use the validation function by using "validate" property
+
+        {
+          initialValues: { },
+          validate: ValidateForm,
+          onSubmit : (values) => { } 
+        }
+
+- Formik "validate" property returns all errors, which you can access by using "formik.errors" object.
+
+        { formik.errors.fieldName }
+
+Ex:  formik with validation
+
+formik-demo.jsx
+
+import { useFormik } from "formik";
+
+export function FormikDemo(){
+
+
+    function ValidateProduct(FormData){
+         var errors = {Name:'', Price:'', Stock:'', City:''};
+
+         //Validating Name
+         if(FormData.Name.length==0) {
+            errors.Name = "Name Required";
+         } else {
+            if(FormData.Name.length<4){
+                errors.Name = "Name too short min 4 chars required";
+            } else {
+                errors.Name = "";
+            }
+         }
+
+         //Validate Price
+         if(FormData.Price.length==0){
+            errors.Price = "Price Required";
+         } else {
+            if(isNaN(FormData.Price)){
+                errors.Price = "Price must be a number";
+            } else {
+                errors.Price = "";
+            }
+         }
+
+         //Validate City
+         if(FormData.City=="-1"){
+            errors.City = "Please select a city";
+         } else {
+            errors.City = "";
+         }
+
+         return errors;
+    }
+
+    const formik = useFormik({
+        initialValues : {
+            Name: '',
+            Price: '',
+            City: '',
+            Stock: false
+        },
+        validate: ValidateProduct,
+        onSubmit: (values)=> {
+            alert(JSON.stringify(values));
+        }
+    })
+
+    return(
+        <div className="container-fluid">
+            <form onSubmit={formik.handleSubmit}>
+                <h3>Register Product</h3>
+                <dl>
+                    <dt>Name</dt>
+                    <dd><input type="text" onBlur={formik.handleBlur} onChange={formik.handleChange} name="Name" /></dd>
+                    <dd className="text-danger">{formik.errors.Name}</dd>
+                    <dt>Price</dt>
+                    <dd><input type="text" onBlur={formik.handleBlur} onChange={formik.handleChange} name="Price" /></dd>
+                    <dd className="text-danger">{formik.errors.Price}</dd>
+
+
+
+                    <dt>Stock</dt>
+                    <dd>
+                        <input type="checkbox" onChange={formik.handleChange} name="Stock" /> <label>In Stock</label>
+                    </dd>
+                    <dt>Shipped To</dt>
+                    <dd>
+                        <select name="City" onChange={formik.handleChange}>
+                            <option value="-1">Select Your City</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Hyd">Hyd</option>
+                        </select>
+                    </dd>
+                    <dd className="text-danger">{formik.errors.City}</dd>
+                </dl>
+                <button>Submit</button>
+            </form>
+        </div>
+    )
+}
+
+
+                        Yup library for Validation

@@ -1,0 +1,205 @@
+3rd Party Form - Formik
+    
+                          Yup Library
+- It is a schema builder.
+- It defines the data structure for every field in a form.
+- Data structure specifies the type of data and behaviour of data.
+- It also restricts data.
+- It is async in operations.
+- It provides various validation services to validate input value.
+    required()
+    min()
+    max()
+    string()
+    number()
+    email()
+    matches() 
+    etc..
+- It is not a form builder, it just validates the form.
+
+Syntax:
+1. Install yup library
+
+    >npm  i  yup  --save
+
+2. You can import specific services or all services.
+
+    import   required, min, max  as  yup  from  "yup";
+    import   * as yup from "yup";
+
+3. Yup uses "object()" method, which is used to create the schema 
+
+    yup.object({
+        FieldName: yup.service1().service2(),
+    })
+
+Note: Yup maps the methods to HTML validation attributes:
+       required, minlength, pattern, email, url etc..
+
+4. Yup schema is configured with form container using formik "ValidationSchema" property.
+
+Syntax:
+        const formik = useFormik({
+            initialValues: { },
+            validationSchema: yup.object({ field:yup.service() })
+        })
+
+5. Formik can return all schema errors using "formik.errors" property.
+
+        { formik.errors.fieldName }
+
+Ex: Yup
+formik-demo.jsx
+
+import { useFormik } from "formik";
+import { useEffect } from "react";
+import * as yup from "yup";
+
+export function FormikDemo(){
+
+
+    const formik = useFormik({
+        initialValues : {
+            Name: '',
+            Price: '',
+            VendorContact: ''
+        },
+        validationSchema: yup.object({
+            Name: yup.string().required("Name Required").min(4, "Name too short"),
+            Price: yup.number().required("Price Required").min(1000,"Price min 1000").max(10000,"Price can be max 10000 only"),
+            VendorContact: yup.string().matches(/\+91\d{10}/,"Invalid Contact +91 10 digits required").required("Mobile Required")
+        }) ,
+        onSubmit: (values)=> {
+            alert(JSON.stringify(values));
+        }
+    })
+
+    return(
+        <div className="container-fluid">
+            <form onSubmit={formik.handleSubmit}>
+                <h3>Register Product</h3>
+                <dl>
+                    <dt>Name</dt>
+                    <dd><input type="text"  onChange={formik.handleChange} name="Name" /></dd>
+                    <dd className="text-danger">{formik.errors.Name}</dd>
+                    <dt>Price</dt>
+                    <dd><input type="text"  onChange={formik.handleChange} name="Price" /></dd>
+                    <dd className="text-danger">{formik.errors.Price}</dd>
+                    <dt>Vendor Contact</dt>
+                    <dd> <input type="text" name="VendorContact" onChange={formik.handleChange} /> </dd>
+                    <dd className="text-danger"> {formik.errors.VendorContact} </dd>
+                </dl>
+                <button>Submit</button>
+            </form>
+        </div>
+    )
+}
+
+- Formik provides a "spread" approach for configuring all events for element.    
+
+        {...formik.getFieldProps("Name") }
+
+  It reads all formik events and binds with the specified field.
+
+Ex:
+formik-demo.jsx
+
+
+import { useFormik } from "formik";
+import { useEffect } from "react";
+import * as yup from "yup";
+
+export function FormikDemo(){
+
+
+    const formik = useFormik({
+        initialValues : {
+            Name: '',
+            Price: '',
+            VendorContact: ''
+        },
+        validationSchema: yup.object({
+            Name: yup.string().required("Name Required").min(4, "Name too short"),
+            Price: yup.number().required("Price Required").min(1000,"Price min 1000").max(10000,"Price can be max 10000 only"),
+            VendorContact: yup.string().matches(/\+91\d{10}/,"Invalid Contact +91 10 digits required").required("Mobile Required")
+        }) ,
+        onSubmit: (values)=> {
+            alert(JSON.stringify(values));
+        }
+    })
+
+
+    return(
+        <div className="container-fluid">
+            <form onSubmit={formik.handleSubmit}>
+                <h3>Register Product</h3>
+                <dl>
+                    <dt>Name</dt>
+                    <dd><input type="text" {...formik.getFieldProps("Name")} name="Name" /></dd>
+                    <dd className="text-danger">{formik.errors.Name}</dd>
+                    <dt>Price</dt>
+                    <dd><input type="text" {...formik.getFieldProps("Price")} name="Price" /></dd>
+                    <dd className="text-danger">{formik.errors.Price}</dd>
+                    <dt>Vendor Contact</dt>
+                    <dd> <input type="text" name="VendorContact" {...formik.getFieldProps("VendorContact")} /> </dd>
+                    <dd className="text-danger"> {formik.errors.VendorContact} </dd>
+                </dl>
+                <button>Submit</button>
+            </form>
+        </div>
+    )
+}
+
+-Formik provides built-in components for designing a form and its fields.
+-Formik components a configured with UI, Funcitonality and Validation.
+-The formik components are
+    
+            <Formik>
+            <Form>
+            <Field>
+            <ErrorMessage>
+            etc..
+
+Syntax:
+    <Formik  initialValues={ }   validation={ }  validationSchema={}  onSubmit={}>
+        <Form>
+            <Field type="text|number|email..."> </Field>
+            <ErrorMessage name=""> </ErrorMessage>
+        </Form>
+    </Formik>
+
+Ex:
+formik-demo.jsx
+
+import { useFormik, Formik, Form, ErrorMessage, Field } from "formik";
+import { useEffect } from "react";
+import * as yup from "yup";
+
+export function FormikDemo(){
+
+    return(
+        <div className="container-fluid">
+            <Formik initialValues={{Name:'',Price:'', VendorContact:''}} validationSchema={yup.object({Name:yup.string().required('Name Required').min(4, 'Name too short'), Price: yup.number().min(1000,"Min 1000 required").max(10000, "Max 10000 only"), VendorContact:yup.string().matches(/\+91\d{10}/,"Invalid Mobile +91 10digits").required("Mobile Required")})} onSubmit={(values)=>{alert(JSON.stringify(values))}} >
+                <Form>
+                    <dl>
+                        <dt>Name</dt>
+                        <dd> <Field type="text" name="Name" /> </dd>
+                        <dd className="text-danger"> <ErrorMessage name="Name" /> </dd>
+                        <dt>Price</dt>
+                        <dd> <Field type="text" name="Price" /> </dd>
+                        <dd className="text-danger"> <ErrorMessage name="Price" /> </dd>
+                        <dt>Vendor Contact</dt>
+                        <dd> <Field type="text" name="VendorContact" /> </dd>
+                        <dd className="text-danger"> <ErrorMessage name="VendorContact" /> </dd>
+                    </dl>
+                    <button>Submit</button>
+                </Form>
+            </Formik>
+        </div>
+    )
+}
+
+- Formik provides validation services which include
+
+        a) Input State Validation
+        b) Form State Validation

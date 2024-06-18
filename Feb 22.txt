@@ -1,0 +1,200 @@
+
+Conversation opened. 1 unread message.
+
+Skip to content
+Using Gmail with screen readers
+sudhakar 
+13 of 38
+New material: "Server Side API"
+Inbox
+
+Sudhakar Sharma (Classroom) <no-reply@classroom.google.com>
+Thu, 22 Feb, 08:56
+to me
+
+
+Classroom Logo
+''	Notification settings
+REACT012024 React 7:30 AM	''
+NEW MATERIAL
+
+Server Side API
+Business Logic
+- Server Side Application
+- Routing
+- Route Parameters
+
+Syntax:
+    app.get("/details/:id/:name", (req, res)=>{
+
+            req.params = {  id:1, name: " " }
+            req.params.id
+       
+    })
+
+    http://127.0.0.1:7000/details/1/tv
+
+- Server Side application requires "CORS" configuration.
+   [Cross Origin Resource Sharing]
+- CORS can limit the requests on API's. It can control request handlers like GET, POST, PUT, PATCH, DELETE, PURGE etc.
+- If you are using POST, PUT, DELETE like actions then API must have CORS enabled.
+
+        >npm i cors --save
+
+        var cors = require("cors")
+
+        app.use(cors());
+
+- Server side application can't read the data encoded in URL.
+- Client data is posted to server application as URL encoded data.
+- Server side app requires a "body parser" that can translate and convert the URL encoded data into JSON.
+- Express JS latest versions provide a built-in body parser.
+
+Syntax:
+        app.use(express.urlencoded({extendend:true});
+        app.use(express.json());
+
+Connecting with Database:
+- To communicate with any database server side application requires "Database Drivers".
+- Database Drivers act as middleware to handle communication between application and database.
+- These is no single driver that can communicate with all databases.
+- To communicate with MongoDB you have to install mongodb driver.
+
+        >npm  i  mongodb --save
+
+- MongoDB provides several class, you have to import  "MongoClient" class.
+- MongoClient provides properties and methods that can handle all CRUD operations.
+
+Syntax:
+        var mongoClient = require("mongodb").MongoClient;
+
+- MongoClient can connect with database server and communicate with database in server.
+
+        mongoClient.connect("connectionString").then(function(clientObject){
+
+             // clientObject can communicate with database when connection is
+                success
+        }).catch(function(error){
+
+            // report errors
+        })
+
+        OLD Version:
+
+        mongoClient.connection("connectionString", function(err, clientObject){
+
+        })
+
+MongoConnection String:    "mongodb://127.0.0.1:27017"
+
+Ex:
+> npm i express --save
+> npm i cors --save
+> npm i mongodb --save
+
+api.js
+
+var express = require("express");
+var cors = require("cors");
+var mongoClient = require("mongodb").MongoClient;
+
+var app = express();
+app.use(cors());
+app.use(express.urlencoded({extended:true}));
+app.use(express.json());
+
+var conString = "mongodb://127.0.0.1:27017";
+
+app.get("/appointments", (req, res)=>{
+
+    mongoClient.connect(conString).then(clientObject=>{
+            var database  = clientObject.db("sampledb");
+            database.collection("appointments").find({}).toArray().then(documents=>{
+                res.send(documents);
+                res.end();
+            });
+    });
+});
+
+app.listen(7000);
+console.log(`Server Started : http://127.0.0.1:7000`);
+
+To-Do Application API Routes:
+
+Method        Path                                Description
+-----------------------------------------------------------------------------------------------------
+GET            /users                            return all users
+POST        /register-user                        adds new user into collection
+GET            /appointments/userId                return all appointments related to
+                                            specific user.
+
+POST        /add-task                            add new appointment
+
+PUT            /edit-task/id                        can modify any appointment using
+                                            its "Id".
+
+DELETE        /delete-task/id                        can remove any appointment                                                 using its "Id".
+
+Ex:
+api.js
+
+var express = require("express");
+var cors = require("cors");
+var mongoClient = require("mongodb").MongoClient;
+
+var app = express();
+app.use(cors());
+app.use(express.urlencoded({extended:true}));
+app.use(express.json());
+
+var conString = "mongodb://127.0.0.1:27017";
+
+app.get("/users", (req, res)=>{
+    mongoClient.connect(conString).then(clientObject=>{
+        var database  = clientObject.db("sampledb");
+        database.collection("users").find({}).toArray().then(documents=>{
+            res.send(documents);
+            res.end();
+        });
+    });
+});
+
+app.post("/register-user", (req, res)=>{
+      var user = {
+          UserId: req.body.UserId,
+          UserName: req.body.UserName,
+          Password: req.body.Password,
+          Mobile: req.body.Mobile,
+          Email:req.body.Email
+      };
+
+      mongoClient.connect(conString).then(clientObject=>{
+           var database = clientObject.db("sampledb");
+           database.collection("users").insertOne(user).then(()=>{
+                console.log("User Added..");
+                res.end();
+           });
+      });
+
+
+});
+
+
+app.get("/appointments/:userid", (req, res)=>{
+
+    mongoClient.connect(conString).then(clientObject=>{
+            var database  = clientObject.db("sampledb");
+            database.collection("appointments").find({UserId:req.params.userid}).toArray().then(documents=>{
+                res.send(documents);
+                res.end();
+            });
+    });
+});
+
+app.listen(7000);
+console.log(`Server Started : http://127.0.0.1:7000`);
+See details
+Posted on 8:54 am, Feb 22 (IST) by Sudhakar Sharma
+Google logoGoogle LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA
+This email was sent to you because you indicated that you'd like to receive email notifications from Google Classroom. If you don't want to receive emails like this, you can unsubscribe or change your settings.
+sudhakar. Press Tab to insert.

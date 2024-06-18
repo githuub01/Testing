@@ -1,0 +1,170 @@
+Google Classroom
+Classroom
+REACT012024
+React 7:30 AM
+Home
+Calendar
+Enrolled
+To do
+R
+REACT012024
+React 7:30 AM
+D
+Data Structure & Algorithms with Java @ 7:30 AM | Mr.Kumar [4th December]
+Mr.Kumar
+D
+DJANGO @ 11:00 AM | Mr.Mahesh [15th Nov] - Online
+Online - Mr.Mahesh
+F
+Full Stack Python @ 9:00 AM | Mr.K.V.Rao [28th Sept] - Online
+Online - Mr.K.V.Rao
+Archived classes
+Settings
+To-Do Application
+Sudhakar Sharma
+•
+24 Feb
+
+react-to-do.txt
+Text
+
+project.zip
+Compressed Archive
+Class comments
+To-Do Application
+Server Side API for To-Do App
+
+GET			/users
+POST		/register-user
+GET			/appointments/user_id
+POST		/add-task
+PUT			/edit-task/1
+DELETE		/delete-task/1
+
+						       api.js
+
+var express = require("express");
+var cors = require("cors");
+var mongoClient = require("mongodb").MongoClient;
+
+var app = express();
+app.use(cors());
+app.use(express.urlencoded({extended:true}));
+app.use(express.json());
+
+var conString = "mongodb://127.0.0.1:27017";
+
+app.get("/users", (req, res)=>{
+    mongoClient.connect(conString).then(clientObject=>{
+        var database  = clientObject.db("sampledb");
+        database.collection("users").find({}).toArray().then(documents=>{
+            res.send(documents);
+            res.end();
+        });
+    });
+});
+
+app.post("/register-user", (req, res)=>{
+      var user = {
+          UserId: req.body.UserId,
+          UserName: req.body.UserName,
+          Password: req.body.Password,
+          Mobile: req.body.Mobile,
+          Email:req.body.Email
+      };
+
+      mongoClient.connect(conString).then(clientObject=>{
+           var database = clientObject.db("sampledb");
+           database.collection("users").insertOne(user).then(()=>{
+                console.log("User Added..");
+                res.end();
+           });
+      });
+
+
+});
+
+app.get("/appointments/:userid", (req, res)=>{
+
+    mongoClient.connect(conString).then(clientObject=>{
+            var database  = clientObject.db("sampledb");
+            database.collection("appointments").find({UserId:req.params.userid}).toArray().then(documents=>{
+                res.send(documents);
+                res.end();
+            });
+    });
+});
+
+app.post("/add-task", (req, res)=>{
+     var task = {
+          Appointment_Id: parseInt(req.body.Appointment_Id),
+          Title: req.body.Title,
+          Description: req.body.Description,
+          Date: new Date(req.body.Date),
+          UserId: req.body.UserId
+     }
+     mongoClient.connect(conString).then(clientObject=>{
+          var database = clientObject.db("sampledb");
+          database.collection("appointments").insertOne(task).then(()=>{
+               console.log("Task Added");
+               res.end();
+          })
+     })
+});
+
+app.put("/edit-task/:id", (req, res)=>{
+     var id = parseInt(req.params.id);
+     mongoClient.connect(conString).then(clientObject=>{
+            var database = clientObject.db("sampledb");
+            database.collection("appointments").updateOne({Appointment_Id:id},{$set: {Appointment_Id:id, Title:req.body.Title, Description: req.body.Description, Date: new Date(req.body.Date), UserId: req.body.UserId}}).then(()=>{
+                console.log("Task-Updated");
+                res.end();
+            });
+     });
+});
+
+app.delete("/delete-task/:id", (req, res)=>{
+
+    var id = parseInt(req.params.id);
+
+    mongoClient.connect(conString).then(clientObject=>{
+        var database = clientObject.db("sampledb");
+        database.collection("appointments").deleteOne({Appointment_Id:id}).then(()=>{
+              console.log("Task-Deleted");
+              res.end();
+        });
+     });
+});
+
+
+app.listen(7000);
+console.log(`Server Started : http://127.0.0.1:7000`);
+
+					  Front End React Application
+					  --------------------------------------
+
+1. Create a new React Application
+
+	>npx  create-react-app   to-do
+
+2. Install following libraries into project
+
+	>npm i  bootstrap  bootstrap-icons   --save
+	>npm i  axios  formik    yup    react-router-dom  --save
+	>npm i  react-cookie --save
+	>npm i  cors  mongodb  express --save
+
+
+
+
+
+
+
+
+
+
+
+
+
+react-to-do.txt
+Displaying react-to-do.txt.

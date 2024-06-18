@@ -1,0 +1,51 @@
+
+Conversation opened. 1 unread message.
+
+Skip to content
+Using Gmail with screen readers
+sudhakar 
+22 of 38
+New material: "Route Parameters"
+Inbox
+
+Sudhakar Sharma (Classroom) <no-reply@classroom.google.com>
+Mon, 12 Feb, 08:55
+to me
+
+
+Classroom Logo
+''	Notification settings
+REACT012024 React 7:30 AM	''
+NEW MATERIAL
+
+Route Parameters
+Routing
+<BrowserRouter>
+<Routes>
+<Route>
+<Link>
+
+                         Route Parameters
+- Route Parameter is configured for routes, so that they can query and render any content within a component.
+
+- Route parameter is configured in route path.
+
+        <Route  path="name/:param1/:param2"   element={ } />
+
+- Values into parameters are passed from address bar of browser
+
+        http://localhost:3000/name/val1/val2
+
+- React components can collect the route parameters using a hook  "useParams()".
+
+- "useParams()" returns an object with key-value pair.
+
+        {
+          param1: val1,
+          param2: val2
+        }
+See details
+Posted on 8:54 am, Feb 12 (IST) by Sudhakar Sharma
+Google logoGoogle LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA
+This email was sent to you because you indicated that you'd like to receive email notifications from Google Classroom. If you don't want to receive emails like this, you can unsubscribe or change your settings.
+sudhakar. Press Tab to insert.

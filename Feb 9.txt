@@ -1,0 +1,133 @@
+
+Conversation opened. 1 read message.
+
+Skip to content
+Using Gmail with screen readers
+sudhakar 
+24 of 38
+New material: "MUI / UX components & Routing"
+Inbox
+
+Sudhakar Sharma (Classroom) <no-reply@classroom.google.com>
+Fri, 9 Feb, 08:55
+to me
+
+
+Classroom Logo
+''	Notification settings
+REACT012024 React 7:30 AM	''
+NEW MATERIAL
+
+MUI / UX components & Routing
+Material UI - Components
+
+To know about any component:
+- Go to "docs" mui
+- Select a component in "API" category
+- In API to use any component you have to look for
+    a) Library to import
+    b) Dependencies
+- Some components require additional dependencies to install.
+
+Note: To use bootstrap components with interactions you have to import bootstrap library into "index.js".
+
+            import  *  as  bootstrap  from  "bootstrap"
+
+      Attributes:
+            data-bs-target
+            data-bs-toggle
+            data-bs-dismiss
+            data-bs-parent
+            data-bs-theme
+            etc..
+
+                            MUI X
+- It provides components with UX.
+- It comprises complex use cases that effect the performance of application.
+        [ Data Grids, Date Picker, Chars, Tree Views .. ]
+
+Ex: Date Picker
+
+1. Install MUI with emotions library
+
+    > npm install @mui/material @emotion/react @emotion/styled
+
+2. Install Date UI/UX library with any dependency like  "day.js, moment.js etc.."
+
+    > npm install @mui/x-date-pickers
+    > npm install dayjs
+
+3. MUI / UX components use additional styles, which required style engine to setup
+
+    > npm install @mui/styled-engine-sc styled-components
+
+4. Date & Time components of MUI / UX require providers
+
+        a) LocalizationProvider
+        b) AdapterDayjs
+
+     Import the providers into your index.js
+
+    import { LocalizationProvider } from '@mui/x-date-pickers';
+        import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+
+
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+               <MUIDemo />
+        </LocalizationProvider>
+
+Ex:
+mui-demo.jsx
+
+import { Button, Modal } from "@mui/material";
+import TextField from "@mui/material/TextField";
+import { DatePicker } from "@mui/x-date-pickers";
+import { useState } from "react";
+
+
+export function MUIDemo(){
+   
+
+    return(
+        <div className="container-fluid">
+            <dl>
+                <dt>Departure</dt>
+                <dd>
+                    <DatePicker />
+                </dd>
+            </dl>
+        </div>
+    )
+}
+                                React Routing
+
+- Routing is a techique used in Web applications to configure user & SEO friendly URL's.
+- Users can query any contents easily from URL.
+- SEO can find the exact location of user in page.
+
+    http://www.amazon.in/electronics.php?category=mobile&amp;model=samsung
+   
+    http://www.amazon.in/electronics/mobile/samsung
+
+- Routing uses implicit Ajax in React.
+- New details are added into page without reloading the page.
+- It is used to design SPA environment. [Single Page Application]
+- Routing can be defined
+    a) Server Side
+    b) Client Side
+- Client side routing enables user to access everything from one page.
+- React implements routing from "react-router-dom" library.
+- React Router library have 2 major versions
+
+        a) react-router-dom  V5   [ react 17 ]
+        b) react-router-dom  V6   [ react  18 ]
+
+- V6 of react-router-dom is complete re-write of library.
+- Install react-router-dom into project
+
+        > npm   install   react-router-dom  --save
+See details
+Posted on 8:54 am, Feb 9 (IST) by Sudhakar Sharma
+Google logoGoogle LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA
+This email was sent to you because you indicated that you'd like to receive email notifications from Google Classroom. If you don't want to receive emails like this, you can unsubscribe or change your settings.
+sudhakar. Press Tab to insert.

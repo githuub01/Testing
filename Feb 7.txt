@@ -1,0 +1,38 @@
+
+Conversation opened. 1 unread message.
+
+Skip to content
+Using Gmail with screen readers
+sudhakar 
+26 of 38
+New material: "Component Life Cycle Hooks"
+Inbox
+
+Sudhakar Sharma (Classroom) <no-reply@classroom.google.com>
+Wed, 7 Feb, 08:57
+to me
+
+
+Classroom Logo
+''	Notification settings
+REACT012024 React 7:30 AM	''
+NEW MATERIAL
+
+Component Life Cycle Hooks
+FAQ: Can we access and use a function component in class component?
+Ans: Yes. It is not directly accessed in class. It is from "render()" method.
+
+
+                    Component Life Cycle Hooks
+- Every component class have various phases from start to end.
+- The time when you request a component initiates start of component and the time when you change to another component will end the component.
+    a) Mount
+    b) Update
+    c) Unmount
+
+                               Routing
+See details
+Posted on 8:56 am, Feb 7 (IST) by Sudhakar Sharma
+Google logoGoogle LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA
+This email was sent to you because you indicated that you'd like to receive email notifications from Google Classroom. If you don't want to receive emails like this, you can unsubscribe or change your settings.
+sudhakar. Press Tab to insert.

@@ -1,0 +1,92 @@
+
+Conversation opened. 1 read message. 
+
+Skip to content
+Using Gmail with screen readers
+sudhakar 
+20 of 38
+New material: "Cookies and Authorization"
+Inbox
+
+Sudhakar Sharma (Classroom) <no-reply@classroom.google.com>
+Wed, 14 Feb, 08:54
+to me
+
+
+Classroom Logo
+''	Notification settings
+REACT012024 React 7:30 AM	''
+NEW MATERIAL
+
+Cookies and Authorization
+Route
+RouteParameters
+NestedRoutes
+                    Authentication & Authorization
+
+- Authentication is the process of verifying user credentials.
+  [userid, password, security token etc..]
+- Authorization is the process of restricting access to resources.
+
+                            Cookies
+- Cookie is a simple text document used to store client details on client device.
+- Cookie is a state management technique used in web applications, where you can store data and use across requests.
+- It is a client side state management technique.
+- Cookies are classified into 2 types
+    a) In-memory cookie [ temporary ]
+    b) Persistent cookie [permanent]
+- JavaScript can manipulate cookies using  "document.cookie".
+- React requires 3 party cookie libraries.
+
+                             React-Cookie
+- It is a 3rd party cookie service.
+- It requires a Provider and Injector.
+
+        <CookieProvider>            Provider
+        useCookies()                Injector
+
+1. Install cookie library
+
+        > npm  i  react-cookie --save
+
+2. Configure cookie provider in "index.js"
+
+import { CookiesProvider } from 'react-cookie';
+
+<CookiesProvider>
+    <App />
+</CookiesProvider>
+
+3. To Access and manipulate  cookie you need  an Injector  "useCookies()"
+
+    const [get, set, delete] = useCookies();
+
+Ex:
+    const [cookies, setCookie, removeCookie] = useCookies('name');
+
+    cookies['name']                             => access cookie value
+    setCookie('name', value, { expires : date })        => create & store value
+    removeCookie('name')                        => delete a cookie
+
+FAQ: What is difference between localstorage, sessionStorage and cookies?
+Ans:
+    a) LocalStorage
+        - It is permanent storage.
+        - It keeps the data in client memory until removed explicitly.
+        - It is accessible across browser tabs.
+        - It is available even when the browser is closed.
+    b) SessionStorage
+        - It is temporary
+        - It is accessible only within the current tab.
+        - It is deleted automatically when browser tab closed.
+    c) Cookie
+        - It can be temporary or permanent
+        - It is accessible across tabs.
+        - It can store large amount of data.
+       
+                            To-do App
+See details
+Posted on 8:53 am, Feb 14 (IST) by Sudhakar Sharma
+Google logoGoogle LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA
+This email was sent to you because you indicated that you'd like to receive email notifications from Google Classroom. If you don't want to receive emails like this, you can unsubscribe or change your settings.
+sudhakar. Press Tab to insert.

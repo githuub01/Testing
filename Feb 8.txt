@@ -1,0 +1,185 @@
+
+Conversation opened. 1 unread message. 
+
+Skip to content
+Using Gmail with screen readers
+sudhakar 
+25 of 38
+New material: "Component Hooks Methods & MUI -…"
+Inbox
+
+Sudhakar Sharma (Classroom) <no-reply@classroom.google.com>
+Thu, 8 Feb, 08:48
+to me
+
+
+Classroom Logo
+''	Notification settings
+REACT012024 React 7:30 AM	''
+NEW MATERIAL
+
+Component Hooks Methods & MUI - Material UI
+Component Life Cycle Hooks
+- componentWillMount()
+- componentDidMount()
+- componentDidUpdate()
+- componentWillUnmount()
+
+Ex:
+cycle-demo.jsx
+
+import React from "react";
+
+export class Admin extends React.Component {
+    constructor(){
+        super();
+    }
+    componentDidMount(){
+        console.log(`Admin Component Requested and Mounted`);
+    }
+    componentWillUnmount(){
+        console.log(`Admin Component Will Unmount`);
+    }
+    render(){
+        return(
+            <div>
+                <span>Admin Portal</span>
+            </div>
+        )
+    }
+}
+
+export class Customer extends React.Component {
+    constructor(){
+        super();
+    }
+    componentDidMount(){
+        console.log(`Customer Component Requested and Mounted`);
+    }
+    componentWillUnmount(){
+        console.log(`Customer Component Will Unmount`);
+    }
+    render(){
+        return(
+            <div>
+                <span>Customer Portal</span>
+            </div>
+        )
+    }
+}
+
+export class CycleDemo extends React.Component
+{
+     constructor(){
+        super();
+        this.state = {
+            Component: ''
+        }
+     }
+
+     handleAdminClick(){
+        this.setState({
+            Component: <Admin />
+        })
+     }
+     handleCustomerClick(){
+        this.setState({
+            Component: <Customer />
+        })
+     }
+
+     render(){
+        return(
+            <div>
+                <h3>Main Component</h3>
+                <button onClick={this.handleAdminClick.bind(this)}>Admin</button>
+                <button onClick={this.handleCustomerClick.bind(this)} >Customer</button>
+                <hr></hr>
+                <div className="mt-4">
+                    {this.state.Component}
+                </div>
+            </div>
+        )
+     }
+}
+
+FAQ: Do we have life cycle hooks for function components?
+Ans: Life cycle hooks are methods used only for class components.
+        Function components have hooks but not life cycle hooks.
+
+FAQ: How to define actions on mount for function component?
+Ans:   By using "useEffect()".
+
+FAQ: How to define unmount actions for function component?
+Ans:  By using "useEffect()" with return statement.
+
+Syntax:
+        useEffect(()=>{
+
+            // actions on mount
+           
+            return ()=>{
+
+               // actions on unmount
+
+            }
+   
+        },[]);
+
+               
+                            React Material UI
+                                 [ MUI ]
+
+- It is a component library for React.
+- It provides built in components and services for React.
+- Components are required for building better UI.
+- Services are required for better performance.
+- MUI Core provides components for free.
+- MUI X provides functions for various use-cases. [User Experince]
+- MUI have fully-built templates.
+- It provides tools for building interactive apps.
+
+Setup MUI for Project:
+
+   > npm install @mui/material @emotion/react @emotion/styled
+
+Note: MUI for React 18x versions use "@emotion" library, which is a complete re-write from its previous  versions.
+
+
+Ex:
+import { Button } from "@mui/material";
+import TextField from "@mui/material/TextField";
+import { useState } from "react";
+
+
+export function MUIDemo(){
+    const [userName, setUserName] = useState('');
+
+    function handleNameChange(e){
+        setUserName(e.target.value)
+    }
+
+    return(
+        <div className="container-fluid">
+            <h1>MUI Demo</h1>
+            <dl className="w-25">
+                <dt>Bootstrap TextBox</dt>
+                <dd><input type="text" className="form-control" placeholder="User Name" /></dd>
+                <dd><button className="btn btn-primary">Submit</button></dd>
+                <dt>MUI TextBox</dt>
+                <dd>
+                    <TextField onChange={handleNameChange} label="User Name" variant="standard" />
+                </dd>
+                <dd>
+                    <Button variant="contained" color="error" > Submit </Button>
+                </dd>
+            </dl>
+            <h3>Hello ! { userName }</h3>
+        </div>
+    )
+}
+See details
+Posted on 8:47 am, Feb 8 (IST) by Sudhakar Sharma
+Google logoGoogle LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA
+This email was sent to you because you indicated that you'd like to receive email notifications from Google Classroom. If you don't want to receive emails like this, you can unsubscribe or change your settings.
+sudhakar. Press Tab to insert.

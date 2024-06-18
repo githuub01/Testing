@@ -1,0 +1,83 @@
+FAQ: Why developers always use "const" for configuring state?
+Ans:  State requires initialization and should not allow assignment.
+         "var & let" in Javascript will allow assignment, hence it is always recommended to
+       use "const" for configuring state.
+
+            let  [name] = useState();        // not good
+            const [name] = useState();    // good
+
+                    Data Binding Techniques
+                    ----------------------------------
+
+- Modern web application use separation concerns by implementing MVC framework.
+- MVC is "Model-View-Controller".
+- "Trygve" introduced MVC framework in early 1970's and formulated with a language called "Small Talk". 
+- Code resuability and Separation concerns. 
+
+                JAVA        - Spring MVC
+                .NET        - ASP.NET MVC
+                Python        - Django, Flask, Grock
+                Ruby        - Ruby on Rails
+                PHP            - Cake PHP, Code Igniter
+                JavaScript    - SPINE
+                etc..
+
+- MVC separates application into 3 components
+
+        a) Model
+        b) View
+        c) Controller
+
+- "Model" represents data.
+- "View" represents UI.
+- "Controller" represents application logic.
+
+One Way Data Binding:
+- It is the process of accessing data from model and updating into UI.
+- Identifying the changes in model and update into UI, everytime when model changes.
+- React uses one way binding technique implicitly.
+- It provides more security to the data.
+
+Two Way Data Binding:
+- It is the process of accessing data from model and updating into UI.
+- Identifying changes in data and updating back to Model from UI.
+- Several technologies that support "Two way binding" they implicilty manage this approach by using various methods.
+- React have to manage "Two way binding" explicitly using various "Event Binding" techniques.
+- React events are "SyntheticEvents" that map to "BrowserEvents".
+
+  SyntheticEvent [Virtual DOM]  => onChange => BrowserEvent [DOM] => onchange
+
+- React can use only "onChange" as event for element to identify the changes in value.
+- It can use other events to handle various other interactions, but not value change.
+
+Syntax:
+    <input type="text"  onChange={functionName} />
+    <select onChange={functionName} />
+    <input type="checkbox" onChange={functionName} />
+
+Ex:
+data-binding.jsx
+
+import './data-binding.css';
+
+import { useState } from 'react';
+
+export function DataBinding(){
+
+    const [userName, setUserName] = useState('John');
+  
+    function handleUserName(e){
+         setUserName(e.target.value);
+    }
+
+    return(
+        <div className="container-fluid">
+           <h2>Two Way Binding</h2>
+           <dl>
+            <dt>User Name</dt>
+            <dd><input type="text" onChange={handleUserName} value={userName} /></dd>
+           </dl>
+           <p>Hello ! {userName} </p>
+        </div>
+    )
+}

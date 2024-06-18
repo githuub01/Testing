@@ -1,0 +1,167 @@
+Enable Bootstrap for React Application:
+
+1. Install bootstrap for project
+
+    > npm  install  bootstrap   bootstrap-icons  --save
+
+2. Import following files into "index.js"
+
+    import   '../node_modules/bootstrap/dist/css/bootstrap.css';
+    import   '../node_modules/bootstrap-icons/font/bootstrap-icons.css';
+
+3. Implement bootstrap & icons with pre-defined classes 
+
+    <h2  className="bi bi-person-fill">  User Login </h2>
+
+    <input type="text"  className="form-control" />
+    
+    <button className="btn btn-primary w-100"> Login </button>
+
+
+                             Data Binding
+
+- It is a technique used in web applications, where the data is accessed from a source and binded to UI.
+
+            var userName = "John";
+
+            <p> </p>
+
+- JavaScript uses lot of DOM methods for data binding.
+
+            function  bodyload()
+            {
+              document.querySelector("p").innerHTML = userName;
+            }
+
+- React uses a data binding expression defined with "{  }", which allows to bind any data directly to UI elements without using any DOM methods.
+
+            var  userName = "John";
+
+            <p> { userName } </p>
+
+- React can use all data types provided by JavaScript
+
+        a) Primitive Types
+            number
+            string
+            boolean
+            null
+            undefined
+            bigint
+            symbol
+        b) Non Primitive Types
+            array
+            object
+            map
+            set
+        c) Additional Types
+            date
+            regExp
+                
+- Binding Primitive Data Types
+
+1. Number Type
+
+- You can present a numeric value exactly as defined
+
+        var  price = 45000.55;
+        
+        <p> { price } </p>
+
+- You can present in local format
+
+        <p>  { price.toLocaleString('en-in', {style : "currency", currency: "INR"}) } </p>
+        <p>  { price.toLocaleString() } </p>
+
+Ex:
+data-binding.jsx
+
+export function DataBinding(){
+
+    var price = 450000.44;
+
+    return(
+        <div className="container-fluid">
+            <h2> {price} </h2>
+            <h2>  {price.toLocaleString('en-in',{style:'currency', currency: 'INR'})} </h2>
+        </div>
+    )
+}
+
+
+2. String Type
+
+- A string can be presented exactly as defined.
+
+        var  title = "amazon";
+
+        <p> { title } </p>
+
+- You can format string using various string formatting methods and present
+
+        <p> { title.toUpperCase() } </p>
+        
+          bold()
+          italics()
+          fontcolor()
+          fontsize()
+          sup()
+          sub()
+          toUpperCase() etc..
+
+Note: A React application is enabled with security that prevents "Cross Site Scripting Attacks" [XSS], you can disable the security to use various formats of string.
+
+- You can manipulate a string while binding using various string manipulation methods.
+
+        charAt(), charCodeAt(), startsWith(), endsWith(), indexOf(), lastIndexOf()
+        slice(), substr(), substring(), split(), trim(), match() etc..
+
+Note: JSX element will not allow any statements within the context of element.
+      You can use in function but not in element scope.
+
+                - Selection Statements
+                - Iteration Statements
+                - Jump Statements
+                - Looping Statements
+                - Exception Handling Statements
+
+       You can handle various interactions in JSX using operators and methods.
+
+Ex:
+data-binding.jsx
+
+export function DataBinding(){
+
+    var email = "john_nit@outlook.com"
+
+    return(
+        <div className="container-fluid">
+           <div className="mt-4">
+                <h1> Your Id  <span className="text-success">{ email.substring(0, email.indexOf("@")) }</span> Registered At  <span className="text-primary">{email.slice(email.indexOf("@")+1)}</span> </h1>
+                <div>
+                  { (email.endsWith("outlook.com")?"You have Microsoft Account": "You have google account") }
+                </div>
+           </div>
+        </div>
+    )
+}
+
+3. Boolean Type
+- JSX can't display a boolean "true / false".
+- You have to use various decision manking techniques to convert and display the relative value for boolean.
+
+Ex: 
+data-binding.jsx
+
+export function DataBinding(){
+
+    var stock = false;
+
+    return(
+        <div className="container-fluid">
+           <div className="mt-4">
+                <h2> Stock { (stock==true)?"Available":"Out of Stock" } </h2>
+           </div>
+        </div>
+    )
+}

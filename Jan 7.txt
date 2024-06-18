@@ -1,0 +1,39 @@
+    return(
+        <div className="container-fluid">
+           <div className="mt-4">
+                <ul>
+                    {
+                        sales.filter(value => value > 40000 ).map(sale=> <li key={sale}>{sale}</li>)
+                    }
+                </ul>
+           </div>
+        </div>
+    )
+}
+
+Ex: Toolbar
+
+import './data-binding.css';
+
+export function DataBinding(){
+
+    var menu = ["Home", "Shop", "Men's Fashion", "Women's Fashion"];
+
+    return(
+        <div className="container-fluid">
+           <nav className='navbar navbar-expand-lg bg-warning text-white'>
+                <div className='container-fluid'>
+                <h2 className='navbar-brand text-white'>Amazon.</h2>
+                <button className='navbar-toggler'> <span className='navbar-toggler-icon'></span> </button>
+                  <ul className='navbar-nav'>
+                    {
+                        menu.map(item=> <li className='nav-item' key={item}> <a className='nav-link'> {item} </a> </li>)
+                    }
+                  </ul>
+                </div>
+           </nav>
+        </div>
+    )
+}
+
+                            Object - JSON

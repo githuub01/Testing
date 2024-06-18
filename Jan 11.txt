@@ -1,0 +1,169 @@
+    - jQuery is a JavaScript library for building UI.
+    - It introduces the approach "write less, do more".
+    - jQuery provides various Ajax methods 
+            $.ajax()
+            $.getJSON() 
+    - It also provides various life cycle methods that track the proccess of ajax request.
+            ajaxStart()    
+            ajaxEnd()
+            ajaxSuccess()
+            ajaxComplete()
+            ajaxEnd()
+     - It is good in errors and exceptions.
+     - It returns data in the format exactly how defined by response header
+     - Explicit parsing methods not required.
+     - It have CORS [Cross Origin Resource Sharing] issues.
+     - Browser may block the data from across orign.
+     - It requires various explicit methods for handling CORS.
+
+ Ex:
+ 1. Install jQuery library for react project
+
+        >npm  install  jquery --save
+
+  2. Import complete jquery library into component
+
+        import  $  from "jquery";
+
+  3. jQuery Ajax methods
+
+         $.ajax({ 
+            method: "get | post | put | delete",
+            url: "api_url",
+            success : function( response ) { },
+            error : function(errorObj) { }
+         })
+
+api-data-binding.jsx
+
+import { useEffect, useState } from "react";
+import $ from "jquery";
+
+
+export function ApiDataBinding()
+{
+
+    const [products, setProducts] = useState([]);
+
+    function LoadData(){
+        $.ajax({
+            method: 'get',
+            url: 'products.json',
+            success:(data)=> {
+                setProducts(data);
+            }
+        })
+    }
+
+    useEffect(()=>{
+        LoadData();
+    },[]);
+
+    return(
+        <div className="container-fluid">
+            <h2>Products Table</h2>
+            <table className="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {
+                        products.map(product =>
+                            <tr key={product.Name}>
+                                <td>{product.Name}</td>
+                                <td>{product.Price}</td>
+                            </tr>
+                            )
+                    }
+                </tbody>
+            </table>
+        </div>
+    )
+}
+
+ 4. 3rd party libraries for react ajax request [npmjs.com]
+    
+            axios, whatwgFetch, telerik, devexpress, mui etc..
+
+- Axios is a popular library for react.
+- It provides various methods for Ajax calls.
+- It is more secured.
+- It handles CORS issues.
+- It is good in errors & exceptions.
+- It can handle multiple request simultaneously at the same time.
+ 
+Ex:
+1. Install axios library for project
+
+    >npm install axios --save 
+
+2. import "axios" 
+
+    import   axios  from  "axios";
+
+    axios.get()
+    axios.post()
+    axios.put()
+    axios.delete()     
+    axios.get([ ])
+
+3. Axios methods are javascript promises.
+
+    axios.get("url").then().catch().finally()
+
+4. axios returns the reponse object with various details
+
+    data            => data returned by API
+    headers        => it comprises of information about response data type
+    statusText    => it returns response status [not found, server error..]
+    
+Ex:
+api-data-binding.jsx
+
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+
+export function ApiDataBinding()
+{
+
+    const [products, setProducts] = useState([]);
+
+    function LoadData(){
+         axios.get("products.json")
+         .then(response=> {
+             setProducts(response.data);
+         })
+    }
+
+    useEffect(()=>{
+        LoadData();
+    },[]);
+
+    return(
+        <div className="container-fluid">
+            <h2>Products Table</h2>
+            <table className="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {
+                        products.map(product =>
+                            <tr key={product.Name}>
+                                <td>{product.Name}</td>
+                                <td>{product.Price}</td>
+                            </tr>
+                            )
+                    }
+                </tbody>
+            </table>
+        </div>
+    )
+}

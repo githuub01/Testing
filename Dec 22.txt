@@ -1,0 +1,272 @@
+
+Conversation opened. 1 read message.
+
+Skip to content
+Using Gmail with screen readers
+10 of 6,588
+New material: "jQuery Ajax"
+Inbox
+
+Sudhakar Sharma (Classroom) <no-reply@classroom.google.com>
+Fri, Dec 22, 8:45 AM (1 day ago)
+to me
+
+
+Classroom Logo
+''	Notification settings
+Full Stack Web with React 7:15 AM Mr. Sudhakar Sharma	''
+NEW MATERIAL
+
+jQuery Ajax
+jQuery DOM Manipulations
+jQuery Events
+
+                                jQuery Effects
+
+- jQuery provides various methods for CSS effects
+
+    show()
+    hide()
+    toggle()
+    slide()
+    slideToggle()
+    fade()
+    fadeToggle()
+    css()
+    etc..
+
+Ex:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css">
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script>
+        $(function(){
+            $("button").click(()=>{
+                 $("img").fadeToggle(2000);
+            })
+        })
+    </script>
+</head>
+<body class="container-fluid">
+        <button class="btn btn-primary mt-2">Preview</button>
+        <div class="mt-3">
+            <img src="../public/images/kids-fashion.jpg" width="200" height="300">
+        </div>
+</body>
+</html>
+
+                             jQuery Ajax
+- JavaScript provides Ajax actions using
+    a) XMLHttpRequest
+    b) fetch()
+
+    * They can't use the data directly from API
+    * They require parsing technique to convert data into JSON
+    * They are not fully secured, can be blocked by CORS.
+       [Cross Origin Resource Sharing]
+    * They are not good in error handling
+
+- jQuery provides Ajax methods
+
+    $.ajax()
+    $.getJSON()
+    $.ajaxStart()
+    $.ajaxEnd()
+    $.ajaxStop()
+    $.ajaxError()
+    $.ajaxComplete()
+    $.ajaxSuccess()
+    etc..
+
+- jQuery Ajax Features
+   
+    * Implicitly converts JSON
+    * Explicit parsing not required
+    * Good in error handling
+    * Manages CORS
+
+Syntax:
+     $.ajax({
+        method: "get|post|put|delete",
+        url: "path",
+        success: () => {} ,
+        error: ( ) => { },
+        data: dataToSend [ post, put ]
+    })
+
+    GET        - Fetching
+    POST    - Submit
+    PUT        - Modify
+    DELETE    - Remove
+    PATCH    - Partial Modify
+
+
+Note: You can't configure events directly for elements that are appended into page dynamically and are present as child elements in a hierarchy of elements.
+      jQuery provides "on()" method to find the element and configure an event.
+
+
+      $(document).on("event", "elementRef", ( ) =>{ })
+
+Ex:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css">
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script>
+
+        function LoadCategories(){
+            $.ajax({
+                method: "get",
+                url: "http://fakestoreapi.com/products/categories&quot;,
+                success: (categories)=> {
+                    categories.unshift("all");
+                    categories.map(category=>{
+                          $(`<option value=${category}>${category.toUpperCase()}</option>`).appendTo("#lstCategories");
+                    })
+                }
+            })
+        }
+
+        function LoadProducts(url){
+            $("main").html("");
+            $.ajax({
+                method:"get",
+                url: url,
+                success: (products=> {
+                    products.map(product=>{
+                        $(`
+                          <div class="card m-2 p-2" style="width:200px">
+                            <img src=${product.image} class="card-img-top" height="140">
+                            <div class="card-header overflow-auto" style="height:140px">
+                                <p> ${product.title} </p>
+                            </div>
+                            <div>
+                                <button id="btnAdd" value=${product.id} class="btn btn-dark w-100"> Add to Cart </button>
+                            </div>
+                          </div>
+                        `).appendTo("main");
+                    })
+                })
+            })
+        }
+
+        $(function(){
+            LoadCategories();
+            LoadProducts(`http://fakestoreapi.com/products`);
+
+            $("#lstCategories").change(()=>{
+                if($("#lstCategories").val()==="all"){
+                    LoadProducts(`http://fakestoreapi.com/products`);
+                } else {
+                    LoadProducts(`http://fakestoreapi.com/products/category/${$(&quot;#lstCategories&quot;).val()}`);
+                }
+            })
+
+            var cartItems = [];
+
+            $(document).on("click", "#btnAdd", (e)=>{
+                 $.ajax({
+                    method: "get",
+                    url: `http://fakestoreapi.com/products/${e.target.value}`,
+                    success: (product)=> {
+                        cartItems.push(product);
+                        alert(`${product.title}\nAdded to Cart`);
+                        console.log(cartItems);
+                    }
+                 })
+            })
+
+        })
+    </script>
+</head>
+<body class="container-fluid">
+    <header class="bg-dark text-white text-center p-2">
+        <div class="h2">Fakestore API</div>
+    </header>
+    <section class="mt-3 row">
+        <nav class="col-2">
+           <label class="form-label fw-bold">Select Category</label>
+           <div>
+              <select class="form-select" id="lstCategories">
+
+              </select>
+           </div>
+        </nav>
+        <main class="col-10 d-flex flex-wrap overflow-auto" style="height:500px">
+
+        </main>
+    </section>
+</body>
+</html>
+
+Ex: SPA [Single Page Application]
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css">
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script>
+        function LoadPage(url){
+            $("main").html("");
+            $.ajax({
+                method:'get',
+                url: url,
+                success:(content) => {
+                    $("main").append(content);
+                }
+            })
+        }
+
+        $(function(){
+             $("button").click((e)=>{
+                 switch(e.target.value){
+                     case 'shopper':
+                     LoadPage('../shopper-template.html');
+                     break;
+                     case 'landkit':
+                     LoadPage('../landkit-template.html');
+                     break;
+                     case 'emi':
+                     LoadPage('../javascript-examples/emi-calculator.html');
+                     break;
+                     case 'kfc':
+                     LoadPage('../javascript-examples/kfc-online.html');
+                     break;
+                 }
+             })
+        })
+    </script>
+</head>
+<body class="container-fluid">
+   
+        <h3>My Projects</h3>
+        <div class="btn-toolbar bg-danger">
+            <button value="shopper" class="btn btn-danger">Shopper</button>
+            <button value="landkit" class="btn btn-danger">Ladkit</button>
+            <button value="emi" class="btn btn-danger">EMI Calculator</button>
+            <button value="kfc" class="btn btn-danger">KFC Online</button>
+        </div>
+ 
+    <main>
+
+    </main>
+</body>
+</html>
+See details
+Posted on 8:43 AM, Dec 22 (IST) by Sudhakar Sharma
+Google logoGoogle LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA
+This email was sent to you because you indicated that you'd like to receive email notifications from Google Classroom. If you don't want to receive emails like this, you can unsubscribe or change your settings.

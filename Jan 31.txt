@@ -1,0 +1,144 @@
+
+Conversation opened. 1 read message. 
+
+Skip to content
+Using Gmail with screen readers
+sudhakar 
+34 of 38
+New material: "React Hooks"
+Inbox
+
+Sudhakar Sharma (Classroom) <no-reply@classroom.google.com>
+Wed, 31 Jan, 09:00
+to me
+
+
+Classroom Logo
+''	Notification settings
+REACT012024 React 7:30 AM	''
+NEW MATERIAL
+
+React Hooks
+Component Properties
+Conditional Rendering
+   
+                            React Hooks
+- Hook is a function used as service for component.
+- Service is a pre-defined business logic, which you can inject and use in your application.
+- Service uses "single ton" pattern.
+  [object created for first request and same is used across multiple requests]
+- Service is controlled using 2 components
+
+    a) Provider
+    b) Injector
+
+- Provider is responsible for locating a service value or function in memory.
+- Injector is responsible for injecting values  or functions into component.
+- The mechanism of locating a value in memory and injecting into component is known as "Dependency Injection". [DI]
+- React provides several pre-defined hooks and also allows to create custom hooks.
+- React 17+ versions introduced hooks.
+- React Hooks can be used only in "function components".
+
+Rules:
+- Hook must be a JS function.
+- It can't be void type.
+- It must return a value.
+- It must be defined with a return type.
+- It must be used always at highier hierarchy.
+- You can't use a hook inside any another function. [configuring at global scope allowed]
+- It must be in camel case.
+   [component must be in pascal case - first letter caps]
+- It can be parameterized or parameter less.
+- If it is parameterized then it must be configured with a event that mounts the hook again when ever parameter changes.
+
+Ex:
+1. Add a new folder into "src" by name "hooks"
+
+2. Add following files into hooks folder
+           
+         captcha.js
+
+export function useCaptcha(){
+    var code = '';
+    var a = Math.random() * 10;
+    var b = Math.random() * 10;
+    var c = Math.random() * 10;
+    var d = Math.random() * 10;
+    var e = Math.random() * 10;
+    var f = Math.random() * 10;
+    code = `${Math.round(a)} ${Math.round(b)} ${Math.round(c)} ${Math.round(d)} ${Math.round(e)} ${Math.round(f)}`
+    return code;
+}
+
+              getapi.js
+
+import { useEffect, useState } from "react";
+
+export function useAPI(url){
+    const [data, setData] = useState();
+    useEffect(()=>{
+        fetch(url)
+        .then(res => res.json())
+        .then(content => setData(content));
+    },[url]);
+    return data;
+}
+
+3. Goto login component
+
+    login.jsx
+
+import React from "react";
+import { useCaptcha } from "../../hooks/captcha";
+import { useAPI } from "../../hooks/getapi";
+
+import "./login.css";
+
+export function Login()
+{
+    const code = useCaptcha();
+    const categories = useAPI('https://fakestoreapi.com/products/categories&#39;);
+    return(
+        <React.Fragment>
+            <main>
+                <form>
+                    <h3 className="bi bi-person-fill"> User Login</h3>
+                    <dl>
+                        <dt>User Name</dt>
+                        <dd><input type="text" className="form-control" /></dd>
+                        <dt>Password</dt>
+                        <dd><input type="password" className="form-control" /></dd>
+                        <dt>Select Category</dt>
+                        <dd>
+                            <select>
+                               {
+                                 categories.map(category=>
+                                    <option key={category}>{category}</option>
+                                    )
+                               }
+                            </select>
+                        </dd>
+                        <dt>Verify Code</dt>
+                        <dd>{code}</dd>
+                    </dl>
+                    <button className="btn btn-primary w-100">Login</button>
+                </form>
+            </main>
+        </React.Fragment>
+    )
+}
+
+- React provides various pre-defined hooks with its core library
+            useState()
+            useEffect()
+            useMemo()
+            useCallback()
+            useRef()
+            useReducer()
+            useContext()
+            etc..
+See details
+Posted on 8:59 am, Jan 31 (IST) by Sudhakar Sharma
+Google logoGoogle LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA
+This email was sent to you because you indicated that you'd like to receive email notifications from Google Classroom. If you don't want to receive emails like this, you can unsubscribe or change your settings.
+sudhakar. Press Tab to insert.

@@ -1,0 +1,145 @@
+setTimeout()
+clearTimeout()
+useRef()
+
+                            setInterval()
+- It loads task into memory and releases a  copy of task into process.
+- It repeats the task at specific time intervals until removed from memory.
+
+Syntax:
+    setInterval(()=>{ } , interval)
+
+- You can remove from memory using "clearInterval()".
+
+Syntax:
+    clearInterval(refName);
+
+
+Ex:
+interval-demo.jsx
+
+import axios from "axios"
+import { useEffect, useRef, useState } from "react"
+
+export function IntervalDemo(){
+
+    const [product, setProduct] = useState({});
+    const [status, setStatus] = useState('');
+    let ProductId = useRef(1);
+    let Thread = useRef(null);
+
+    function LoadProduct(id){
+         axios.get(https://fakestoreapi.com/products/${id})
+         .then(res=> {
+            setProduct(res.data);
+         })
+    }
+
+    function LoadProductAuto(){
+        ProductId.current++;
+        axios.get(https://fakestoreapi.com/products/${ProductId.current})
+         .then(res=> {
+            setProduct(res.data);
+         })
+    }
+
+    useEffect(()=>{
+        LoadProduct(ProductId.current)
+    },[])
+
+    function NextClick(){
+        ProductId.current = ProductId.current + 1;
+        LoadProduct(ProductId.current);
+    }
+
+    function PrevClick(){
+        ProductId.current = ProductId.current - 1;
+        LoadProduct(ProductId.current);
+    }
+
+    function PlayClick(){
+       Thread.current =  setInterval(LoadProductAuto, 5000);
+        setStatus('Slide Show - Started');
+    }
+    function PauseClick(){
+        clearInterval(Thread.current);
+        setStatus('Slide Show - Paused');
+    }
+
+    return(
+        <div className="container-fluid d-flex justify-content-center">
+            <div className="card p-2 w-50 mt-4">
+                <div className="card-header text-center">
+                    {product.title}
+                    <br />
+                    {status}
+                </div>
+                <div className="card-body">
+                    <div className="row">
+                      <div className="col-1 d-flex flex-column align-items-center justify-content-center">
+                            <button onClick={PrevClick} className="bi bi-chevron-left btn"></button>
+                      </div>
+                      <div className="col-10">
+                        <img width="100%" src={product.image} height="300" />
+                      </div>
+                      <div className="col-1 d-flex flex-column align-items-center justify-content-center">
+                        <button onClick={NextClick} className="bi bi-chevron-right btn "></button>
+                      </div>
+                    </div>
+                </div>
+                <div className="card-footer text-center">
+                    <button onClick={PlayClick} className="btn btn-primary me-2 bi bi-play"></button>
+                    <button onClick={PauseClick} className="btn btn-danger bi bi-pause"></button>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+Ex:
+Progress-Demo.jsx
+
+import { useRef, useState } from "react"
+
+export function ProgressDemo(){
+
+    const [Progressdisplay, setProgressDisplay] = useState('d-none');
+    const [ImageDisplay, setImageDisplay] = useState('d-none');
+    const [buttonDisplay, setButtonDisplay] = useState('d-block');
+    const [count, setCount] = useState(1);
+
+    let i = 1;
+    function Progress(){
+        i++;
+        setCount(i);
+        if(i==100){
+            setImageDisplay('d-block');
+            setProgressDisplay('d-none');
+        }
+    }
+
+    function LoadClick(){
+        setInterval(Progress,100);
+        setProgressDisplay('d-block');
+        setButtonDisplay('d-none');
+    }
+
+    return(
+        <div className="d-flex container-fluid justify-content-center align-items-center" style={{height:'100vh'}}>
+
+            <div className={buttonDisplay}>
+                <button onClick={LoadClick} className="btn btn-primary">Load Image</button>
+            </div>
+            <div className={Progressdisplay}>
+                <progress min="1" max="100" value={count} style={{width:'300px', height:'30px'}}></progress>
+                <p className="text-center">{count} % Completed</p>
+            </div>
+            <div className={ImageDisplay}>
+                <img src="m1.jpg" width="300" height="400" />
+            </div>
+        </div>
+    )
+}
+
+                        Component Properties
+                        Hooks

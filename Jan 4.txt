@@ -1,0 +1,27 @@
+-
+    node_modules          It comprises of all library files installed in project.
+    public                  It comprises of all static resources [html, images, docs..]
+    src                      It comprises of dynamic resources [.js, .ts, .css, .scss..]
+    package.json              It comprises project meta data 
+    package.lock.json          It comprises of library meta data
+    .gitignore                  It configures the repository to ignore while publishing on
+                          GIT.
+    Readme.md              It is a help documentation provided for developers.
+
+
+React Basic Flow:
+  
+   - Application starts with "index.html" [public]
+   - Code for index.html comes from "index.js" [src]
+   - index.js is using a component "<App>" to render into index.html 
+   - <App> component code is defined in "App.js"
+
+    <div id="root"> </div>            => index.html
+
+     const root = ReactDOM.createRoot(document.getElementById("root");
+     root.render( <App /> )
+
+To start project
+
+     > npm start        
+    http://localhost:3000

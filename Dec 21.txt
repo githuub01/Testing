@@ -1,0 +1,308 @@
+
+Conversation opened. 1 unread message. 
+
+Skip to content
+Using Gmail with screen readers
+Enable desktop notifications for Gmail.
+   OK  No thanks
+12 of 6,579
+New material: "jQuery"
+Inbox
+
+Sudhakar Sharma (Classroom) <no-reply@classroom.google.com>
+Thu, Dec 21, 8:37 AM (1 day ago)
+to me
+
+
+Classroom Logo
+''	Notification settings
+Full Stack Web with React 7:15 AM Mr. Sudhakar Sharma	''
+NEW MATERIAL
+
+jQuery
+jQuery
+                             write less, do more
+
+- jQuery is a JavaScript library used to build interactive UI.
+- It provides various pre-defined functions to handle
+        a) Data Binding
+        b) Class Binding
+        c) Style Binding
+        d) DOM Manipulations
+        e) Animations & Effects
+
+Setup jQuery:
+
+    >npm install jquery --save
+
+Configure jQuery:
+
+    <head>
+        <script  src="../node_modules/jquery/dist/jquery.js"> </script>
+        <script>
+             $(function(){                 $(document).ready(function(){
+                            (or)
+              })                         })
+        </script>
+    </head>
+
+Refer HTML elements:
+- jQuery can refer HTML elements by using CSS selectors.
+
+Syntax:
+        <p>  </p>
+        <div id="msg">
+        <button class="btn">
+        <nav>
+            <span> </span>
+        </nav>
+
+        $("p").text()
+        $("#msg").text()
+        $(".btn").html()
+        $("nav span").text()
+
+Ex:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script>
+        $(function(){
+             $("h1").text("jQuery");
+             $("#subtitle").text("write less, do more");
+             $(".text").text("JavaScript library for building UI");
+        })
+    </script>
+</head>
+<body>
+    <h1></h1>
+    <p id="subtitle"></p>
+    <div class="text"></div>
+</body>
+</html>
+       
+jQuery DOM methods:
+
+        text()            innerText
+        html()            innerHTML
+        val()                value
+        attr()                attribute
+        prop()            property
+        css()            set style
+        append()            add to end
+        prepend()        add to start
+        before()            add above
+        after()            add after
+        appendTo()        add to specific element
+        etc..
+
+Ex:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script>
+        $(function(){
+             $("h1").text("jQuery");
+             $("#subtitle").text("write less, do more");
+             $("#subtitle").prepend("<b>jQuery can</b> ");
+             $("#subtitle").append(" functionality");
+             $("#subtitle").before("Hello !");
+             $("#subtitle").after("Start using jquery");
+             $(".text").text("JavaScript library for building UI");
+        })
+    </script>
+</head>
+<body>
+    <h1></h1>
+    <p id="subtitle"></p>
+    <div class="text"></div>
+</body>
+</html>
+
+
+Ex:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script>
+        $(function(){
+            $("<img src='../public/images/women-fashion.jpg' width='100' height='100'>").appendTo("#container");
+            $("#container").append("<button>Submit</button>");
+        })
+    </script>
+</head>
+<body>
+    <div id="container"></div>
+</body>
+</html>
+
+
+Ex:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script>
+        $(function(){
+             var categories = ["All", "Electronics", "Footwear", "Fashion"];
+             categories.map(category =>{
+                  $(`<li>${category}</li>`).appendTo("ol");
+                  $(`<option>${category}</option>`).appendTo("select");
+             })
+        })
+    </script>
+</head>
+<body>
+    <ol></ol>
+    <select></select>
+</body>
+</html>
+
+
+Ex: Fakestore
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css">
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script>
+        $(function(){
+             fetch('http://fakestoreapi.com/products&#39;)
+             .then(res=> res.json())
+             .then(products=> {
+                  products.map(product=> {
+                      $(`<tr>
+                           <td>${product.title}</td>
+                           <td><img src=${product.image} width="100" height="100"></td>
+                        </tr>`).appendTo("tbody");
+                  })
+             })
+        })
+    </script>
+</head>
+<body class="container-fluid">
+   <table class="table mt-4 table-hover">
+      <thead>
+        <tr>
+            <th>Title</th>
+            <th>Preview</th>
+        </tr>
+      </thead>
+      <tbody>
+
+      </tbody>
+   </table>
+</body>
+</html>
+
+Ex:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css">
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script>
+        $(function(){
+             fetch('http://fakestoreapi.com/products&#39;)
+             .then(res=> res.json())
+             .then(products=> {
+                  products.map(product=> {
+                      $(`
+                       <div class="card m-2 p-2" style="width:200px">
+                         <img src=${product.image} class="card-img-top" height="140">
+                         <div class="card-header" style="height:140px">
+                            ${product.title}
+                         </div>
+                       </div>
+                      `).appendTo("main");
+                  })
+             })
+        })
+    </script>
+</head>
+<body class="container-fluid">
+     <main class="d-flex flex-wrap overflow-auto mt-4" style="height: 500px;">
+
+     </main>
+</body>
+</html>
+
+jQuery Events:
+- jQuery uses all JavaScript browser events.
+- jQuery events are added to elements as listeners.
+- It enables clean separation of code and design.
+
+Syntax:
+
+    <button> Insert </button>
+    <select> </select>
+
+      $("button").click(()=>{ });
+      $("select").change(()=> { });
+   
+- Event arguments in jQuery support only "event".
+
+      $("button").click((e)=>{
+            e.target.id, name, value, className
+            e.clientX, clientY, keyCode
+    })
+
+
+Ex:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css">
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script>
+        $(function(){
+            $("#btnInsert").click((e)=>{
+                $("p").html(`Record Inserted<br> Id=${e.target.id}<br>X=${e.clientX}`);
+            })
+
+            $("select").change(()=>{
+                $("p").html(`Your Selected : ${$("select").val()}`)
+            })
+        })
+    </script>
+</head>
+<body class="container-fluid">
+     <button id="btnInsert">Insert</button>
+     <select>
+        <option>Select Operation</option>
+        <option>Insert</option>
+        <option>Update</option>
+        <option>Delete</option>
+     </select>
+     <p></p>
+</body>
+</html>
+See details
+Posted on 8:35 AM, Dec 21 (IST) by Sudhakar Sharma
+Google logoGoogle LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA
+This email was sent to you because you indicated that you'd like to receive email notifications from Google Classroom. If you don't want to receive emails like this, you can unsubscribe or change your settings.

@@ -1,0 +1,151 @@
+
+Conversation opened. 1 unread message. 
+
+Skip to content
+Using Gmail with screen readers
+sudhakar 
+27 of 38
+New material: "Events in Class Component"
+Inbox
+
+Sudhakar Sharma (Classroom) <no-reply@classroom.google.com>
+Tue, 6 Feb, 09:00
+to me
+
+
+Classroom Logo
+''	Notification settings
+REACT012024 React 7:30 AM	''
+NEW MATERIAL
+
+Events in Class Component
+Class Component in React
+- React.Component
+- React.PureComponent
+- State [Built-in]
+- componentDidMount()
+
+FAQ: Why can't we write actions to perform while creating instance for component?
+         [actions in constructor]
+
+Ans:  Constructor is a special type of sub-routine that executes only once per object.
+      It can't assign new values on change.
+      Setting state in constructor at the time of initializing state will lead to "bug".
+      It is not recommended to set state before mounting a component.
+
+Events in Class component
+- All events are synthetic events.
+- In class component events map to methods.
+
+            handleNameChange()
+            {
+            }
+
+            <input type="text" onChange={this.handleNameChange}>
+
+- Methods defined for events can't use state.
+- You have to register every method at the time on constructing a component, and bind with the class memory. So that it can use the state.
+- React provides "bind()" method to bind the actions with current class state.
+- You can bind the method using "eager loading" approach.
+
+        constructor()
+        {
+           this.handleName = this.handleName.bind(this);
+           this.handleAge = this.handleAge.bind(this);
+        }
+
+- You can bind the method using "lazy loading" approach. It binds only when it is used.
+
+    <input type="text"  onChange={this.handleName.bind(this)} />
+
+- You can use all event args in the same way how u defined in function components.
+   
+      handleName(e)
+      {
+        e.clientX, keyCode, which
+        e.target.id, name, value
+      }
+
+FAQ: Can we configure event handlers without bind method?
+Ans: Yes. You have to configure a function that returns the current method memory to the current class.
+
+Syntax:
+    <input type="text"  onChange={ (e)=> this.handleName(e) }  />
+
+Ex:
+register-user.jsx
+
+import React from "react";
+
+
+export class RegisterUser extends React.Component
+{
+    constructor(){
+        super();
+        this.state = {
+            Name: '',
+            Age: 0      
+        }
+        this.handleNameChange = this.handleNameChange.bind(this);
+    }
+
+    handleNameChange(e){
+        this.setState({
+            Name: e.target.value,
+            Age: this.state.Age
+        })
+    }
+    handleAgeChange(e) {
+        this.setState({
+            Age: e.target.value,
+            Name:this.state.Name
+        })
+    }
+
+    render(){
+        return(
+            <div className="container mt-2  p-2">
+                <h3>Register</h3>
+                <dl>
+                    <dt>Name</dt>
+                    <dd><input type="text" onChange={this.handleNameChange} /></dd>
+                    <dt>Age</dt>
+                    <dd><input type="number" onChange={(e)=> this.handleAgeChange(e)} /></dd>
+                </dl>
+                <p>
+                    Name : {this.state.Name} <br />
+                    Age : {this.state.Age}
+                </p>
+            </div>
+        )
+    }
+}
+
+- Component can use properties by using "this.props" derived from base "Component" class.
+- "this.props" is an object.
+
+Ex:
+ tool-bar.jsx
+
+import React from "react";
+
+export class ToolBar extends React.Component
+{
+     constructor(){
+         super();
+     }
+     render(){
+         return(
+            <div>
+               <nav className="bg-dark text-white p-2">
+                 <h4>{this.props.title}</h4>
+               </nav>
+            </div>
+         )
+     }
+}
+See details
+Posted on 8:59 am, Feb 6 (IST) by Sudhakar Sharma
+Google logoGoogle LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA
+This email was sent to you because you indicated that you'd like to receive email notifications from Google Classroom. If you don't want to receive emails like this, you can unsubscribe or change your settings.
+sudhakar. Press Tab to insert.

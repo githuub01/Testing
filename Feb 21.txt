@@ -1,0 +1,151 @@
+
+Conversation opened. 1 read message.
+
+Skip to content
+Using Gmail with screen readers
+sudhakar 
+14 of 38
+New material: "API"
+Inbox
+
+Sudhakar Sharma (Classroom) <no-reply@classroom.google.com>
+Wed, 21 Feb, 08:58
+to me
+
+
+Classroom Logo
+''	Notification settings
+REACT012024 React 7:30 AM	''
+NEW MATERIAL
+
+API
+What is distributed computing?
+What is Web Service?
+Issues with Web Service
+What is API
+
+MERN
+                           Business Logic
+                                  [ API ]
+- Node JS
+- Express JS
+
+Node JS
+- It is built on google chrome v8 compiler.
+- It is Javascript based server side technology.
+- Server side scripting is a technique where scripts are employed on server inorder to generate a response customized to every client request.
+- Node JS provides a set of server side objects, which are responsible for handling interactions on server.
+
+            - path
+            - os [Operating System]
+            - fs [File Stream]
+            - http
+
+Features of Node JS:
+- It is single threaded.
+- It is modular.
+- Application specific framework or library is used.
+- Light weight
+- Faster
+- It doesn't use caching. [Buffering]
+- It gets data in form of memory packets.
+
+Express JS:
+- It is a middleware framework.
+- It is Javascript based.
+- Middleware is a software framework that handle communication between computers in network.
+- It is responsible for
+        a) Configuring Server to host API
+        b) Handle request from client
+        c) Send html, xml, file, json response to client.
+        d) Parsing the data
+        etc..
+
+Create Server Side App:
+
+1. Install Express JS in your project
+
+    > npm  i  express --save
+
+2. Import express library - Node uses "require()" method to import library.
+
+    var express = require("express");
+
+3. Create server side app with express
+
+    var app = express();        
+
+4. Server side app requires routing to configure
+
+    app.get("/path", function(request, response){
+
+        })
+
+    - request object provides properties and methods that are used to access data
+      from client, which can be from query string, formbody, cookies etc.
+
+    - response object provides properties and method that are used to send response
+      to client, which can be html, json, file, xml etc.
+
+Syntax:
+    app.get("/", (req, res)=>{
+          res.send("data");
+          res.end();
+    })
+
+5. Application starts on local server at specific port number by using "listen()".
+
+    app.listen(8080);
+   
+    http://127.0.0.1:8080            -> server app
+
+Note: Node JavaScript can't have any DOM methods. It uses Javascript console and language features.
+
+                    api.js
+
+var express = require("express");
+
+var app = express();
+
+app.get("/",(req, res)=>{
+    res.send("<h2>Welcome to API's</h2>");
+    res.end();
+});
+
+app.get("/categories",(req, res)=>{
+    res.send([{CategoryId:1, CategoryName:"Electronics"},{CategoryId:2, CategoryName:"Fashion"}]);
+    res.end();
+});
+
+app.get("/products", (req, res)=>{
+    res.send(
+        <Products>
+            <Product>
+                <Id>1</Id>
+                <Name>TV</Name>
+            </Product>
+            <Product>
+                <Id>2</Id>
+                <Name>Mobile</Name>
+            </Product>
+        </Products>
+    );
+    res.end();
+});
+
+app.get("*",(req, res)=>{
+    res.send("Not Found - 404");
+    res.end();
+});
+
+app.listen(7000);
+console.log("Server Started http://127.0.0.1:7000");
+
+6. Run node program
+
+        > node  api.js
+See details
+Posted on 8:57 am, Feb 21 (IST) by Sudhakar Sharma
+Google logoGoogle LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA
+This email was sent to you because you indicated that you'd like to receive email notifications from Google Classroom. If you don't want to receive emails like this, you can unsubscribe or change your settings.
+sudhakar. Press Tab to insert.

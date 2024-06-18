@@ -1,0 +1,303 @@
+
+Conversation opened. 1 unread message.
+
+Skip to content
+Using Gmail with screen readers
+sudhakar 
+28 of 38
+New material: "Class Components"
+Inbox
+
+Sudhakar Sharma (Classroom) <no-reply@classroom.google.com>
+Mon, 5 Feb, 09:00
+to me
+
+
+Classroom Logo
+''	Notification settings
+REACT012024 React 7:30 AM	''
+NEW MATERIAL
+
+Class Components
+- Classes
+    a) Property
+    b) Accessor
+    c) Method
+    d) Constructor
+- Inheritance
+    Super Class
+    Derived Class
+    extends
+   
+Note: A derived class constructor must call the super class constructor.
+
+Syntax:
+    class Super
+    {
+       constructor() { }
+    }
+    class Derived extends Super
+    {
+        constructor(){
+         super();
+        }
+    }
+
+- Polymorphism
+    A single super class reference can use the memory of multiple derived classes.
+
+
+                           React Class Components
+
+- React class component is designed by using JavaScript class.
+
+        export class ComponentName
+        {
+
+        }
+
+- Every component class gets the behaviour from the base classes
+
+        a) React.Component    
+        b) React.PureComponent
+
+- "Component" base will load entire component when ever change occured.
+- "PureComponent" base loads only the changes in component.
+
+Syntax:
+    import  React from "react";
+
+    export class Register extends  React.Component | React.PureComponent
+    {
+    }
+
+- Class component returns a "Fragment" using "render()" method.
+- It must call the super constructor.
+
+Syntax:
+    export class Register extends React.Component
+    {
+       constructor(){
+        super();
+       }
+       render(){
+         return(
+            <>
+
+            </>
+         )
+       }
+    }
+
+Ex:
+register-user.jsx
+
+import React from "react";
+
+export class RegisterUser extends React.Component
+{
+    constructor(){
+        super();
+    }
+    render(){
+        return(
+            <div>
+                <h2>Register Class Component</h2>
+            </div>
+        )
+    }
+}
+
+- Data Binding, Class & Style binding are same as you defined in function component.
+- Data can't be stored in "Variables" as they are not allowed in class as class member.
+- Data can be Property but it is immutable in a component.
+- You can't use "useState()" hook in class component.
+- Hooks are functions and they are not allowed in class.
+
+Ex: Data in Property
+
+import React from "react";
+export class RegisterUser extends React.Component
+{
+    constructor(){
+        super();
+    }
+    Title = "Welcome to React Class Components";
+    Cities = ["All", "Delhi", "Hyd"];
+    render(){
+        return(
+            <div>
+                <h2> {this.Title} </h2>
+                <select>
+                    {
+                        this.Cities.map(city=><option key={city}>{city}</option>)
+                    }
+                </select>
+            </div>
+        )
+    }
+}
+
+- React.Component base provides a "State"
+- The custom component can access the state, which is an object type.
+- State is initialized in constructor of custom component using "this.state".
+
+Syntax:
+        constructor()
+        {
+            this.state = {
+             key : value,
+             key : value
+              }
+        }
+
+- You can access the state using "this.state"
+
+        <p> { this.state.key } </p>
+
+- React.Component base provide "setState()" which is used to initialize a new value into state.
+
+         this.setState({key: value, key:value})
+
+- React.Component provides "componentDidMount()  & componentWillMount()" methods, which are used to define actions to perform at the time of mounting component.
+
+Syntax:
+        componentDidMount() {
+            this.setState({ key : value })
+        }
+
+Ex:
+ register-user.jsx
+
+import React from "react";
+
+export class RegisterUser extends React.Component
+{
+    constructor(){
+        super();
+        this.state = {
+            Title: "",
+            Categories: []
+        }
+    }
+
+    componentDidMount(){
+        this.setState({
+            Title: 'Hello ! React',
+            Categories: ["All", "Electronics", "Footwear", "Fashion"]
+        })
+    }
+   
+    render(){
+        return(
+            <div>
+                <h2>{this.state.Title}</h2>
+                <ol>
+                    {
+                        this.state.Categories.map(category=><li key={category}>{category}</li>)
+                    }
+                </ol>
+            </div>
+        )
+    }
+}
+
+Ex: Style & Class
+import React from "react";
+
+
+export class RegisterUser extends React.Component
+{
+    constructor(){
+        super();
+        this.state = {
+            Title: "",
+            Categories: []
+        }
+    }
+
+    componentDidMount(){
+        this.setState({
+            Title: 'Hello ! React',
+            Categories: ["All", "Electronics", "Footwear", "Fashion"],
+            StyleObj : {boxShadow:'12px 12px 12px gray'}
+        })
+    }
+   
+    render(){
+        return(
+            <div style={this.state.StyleObj} className="container mt-2 bg-dark text-white p-2">
+                <h2>{this.state.Title}</h2>
+                <ol>
+                    {
+                        this.state.Categories.map(category=><li key={category}>{category}</li>)
+                    }
+                </ol>
+            </div>
+        )
+    }
+}
+
+                          Two Way Binding in Class
+- Events are same as function component.
+- Events are derived from "SyntheticEvents". [Virtual DOM Events]
+- In class events subscriber is method.
+- Event sends a message to the subscriber.
+
+Syntax:
+        class   Name
+        {
+             MethodName() {
+             }
+        }
+
+        <button  onClick={this.MethodName}>
+
+Ex:
+import React from "react";
+
+
+export class RegisterUser extends React.Component
+{
+    constructor(){
+        super();
+        this.state = {
+            Title: "",
+            Categories: []
+        }
+    }
+
+    componentDidMount(){
+        this.setState({
+            Title: 'Hello ! React',
+            Categories: ["All", "Electronics", "Footwear", "Fashion"],
+            StyleObj : {boxShadow:'12px 12px 12px gray'}
+        })
+    }
+
+    handleOkClick(){
+        alert('OK Clicked');
+    }
+   
+    render(){
+        return(
+            <div style={this.state.StyleObj} className="container mt-2 bg-dark text-white p-2">
+                <h2>{this.state.Title}</h2>
+                <ol>
+                    {
+                        this.state.Categories.map(category=><li key={category}>{category}</li>)
+                    }
+                </ol>
+                <button onClick={this.handleOkClick} className="btn btn-light">OK</button>
+            </div>
+        )
+    }
+}
+
+Note: You need various binding techniques in order to bind the event with state.
+      Events can't use the state directly.
+See details
+Posted on 8:59 am, Feb 5 (IST) by Sudhakar Sharma
+Google logoGoogle LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA
+This email was sent to you because you indicated that you'd like to receive email notifications from Google Classroom. If you don't want to receive emails like this, you can unsubscribe or change your settings.
+sudhakar. Press Tab to insert.

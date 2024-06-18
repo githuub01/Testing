@@ -1,0 +1,125 @@
+     function handleSubmitClick(){
+         setFormData(product);
+     }
+
+
+    return(
+        <div className="container-fluid">
+           <div className='row mt-4'>
+                <div className='col-3'>
+                    <dl>
+                        <h3>Register Product</h3>
+                        <dt>Name</dt>
+                        <dd><input type="text" onChange={handleNameChange} className='form-control' /></dd>
+                        <dt>Price</dt>
+                        <dd><input type="number" onChange={handlePriceChange} className='form-control' /></dd>
+                        <dt>Shipped To</dt>
+                        <dd>
+                            <select className='form-select' onChange={handleCityChange}>
+                                <option>Select City</option>
+                                <option>Delhi</option>
+                                <option>Hyd</option>
+                            </select>
+                        </dd>
+                        <dt>Stock</dt>
+                        <dd className='form-switch'>
+                            <input onChange={handleStockChange} type="checkbox" className='form-check-input' /> <label>Available</label>
+                        </dd>
+                    </dl>
+                    <button onClick={handleSubmitClick} className='btn btn-primary w-100'>Submit</button>
+                </div>
+                <div className='col-9 ps-4'>
+                    <h3>Product Details</h3>
+                    <dl>
+                        <dt>Name</dt>
+                        <dd>{formData.Name}</dd>
+                        <dt>Price</dt>
+                        <dd>{formData.Price}</dd>
+                        <dt>Shipped To</dt>
+                        <dd>{formData.City}</dd>
+                        <dt>Stock</dt>
+                        <dd> {(formData.Stock==true)?"Available":"Out of Stock"} </dd>
+                    </dl>
+                </div>
+           </div>
+        </div>
+    )
+}
+
+FAQ: When state is created for a component?
+Ans : State is configured for component at the time of creating instance of component.
+
+FAQ: How you will configure actions for component at the time of loading component?
+Ans:  Component have "Mount" phase, which is the loading phase.
+          A function component configures mount phase using a hook called "useEffect()".
+          A class componenent configure mount phase using the methods:
+        a) componentWillMount()
+        b) componentDidMount()
+
+Syntax: 
+    import  {  useEffect }  from  "react";
+
+    useEffect(()=>{
+    
+        //actions
+
+    },[dependencies]);
+
+    Dependencies specify when a component have to mount again.
+
+Binding Data from API :
+- XMLHttpRequest 
+- Fetch()
+- jQuery Ajax
+- 3rd party library
+
+
+Ex:
+import { useEffect, useState } from "react"
+
+
+export function ApiDataBinding()
+{
+
+    const [products, setProducts] = useState([]);
+
+    function LoadData(){
+        var http = new XMLHttpRequest();
+        http.open("get", "products.json", true);
+        http.send();
+        http.onreadystatechange = function(){
+            if(http.readyState==4){
+                setProducts(JSON.parse(http.responseText));
+                console.log(http.responseText);
+            }
+        }
+    }
+
+    useEffect(()=>{
+        LoadData();
+    },[]);
+
+    return(
+        <div className="container-fluid">
+            <h2>Products Table</h2>
+            <table className="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {
+                        products.map(product =>
+                            <tr key={product.Name}>
+                                <td>{product.Name}</td>
+                                <td>{product.Price}</td>
+                            </tr>
+                            )
+                    }
+                </tbody>
+            </table>
+        </div>
+    )
+}

@@ -1,0 +1,58 @@
+1. Install formik library for your project
+
+        >npm  i formik --save
+
+2. Formik library provides "useFormik()" hook, which is used to configure a form.
+
+    import  { useFormik  } from "formik";
+
+    const  formik = useFormik({ options });
+
+    options:
+        a) initialValues
+        b) onSubmit
+        c) validation
+        d) validationSchema 
+
+3. Formik have various built-in events
+        a) handleChange
+        b) handleBlur
+        c) handleSubmit 
+        etc..
+
+Ex: formik-demo.jsx
+
+import { useFormik } from "formik";
+
+export function FormikDemo(){
+
+    const formik = useFormik({
+        initialValues : {
+            Name: '',
+            Price: 0,
+            Stock: false
+        },
+        onSubmit: (values)=> {
+            alert(JSON.stringify(values));
+        }
+    })
+
+    return(
+        <div className="container-fluid">
+            <form onSubmit={formik.handleSubmit}>
+                <h3>Register Product</h3>
+                <dl>
+                    <dt>Name</dt>
+                    <dd><input type="text" onChange={formik.handleChange} name="Name" /></dd>
+                    <dt>Price</dt>
+                    <dd><input type="number" onChange={formik.handleChange} name="Price" /></dd>
+                    <dt>Stock</dt>
+                    <dd>
+                        <input type="checkbox" onChange={formik.handleChange} name="Stock" /> <label>In Stock</label>
+                    </dd>
+                </dl>
+                <button>Submit</button>
+            </form>
+        </div>
+    )
+}

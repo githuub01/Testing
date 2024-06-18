@@ -1,0 +1,271 @@
+
+Conversation opened. 1 read message.
+
+Skip to content
+Using Gmail with screen readers
+sudhakar 
+35 of 38
+New material: "Component Properties & Conditional…"
+Inbox
+
+Sudhakar Sharma (Classroom) <no-reply@classroom.google.com>
+Tue, 30 Jan, 08:52
+to me
+
+
+Classroom Logo
+''	Notification settings
+REACT012024 React 7:30 AM	''
+NEW MATERIAL
+
+Component Properties & Conditional Render
+Summary - Component
+- Data Binding
+- Style Binding
+- Class Binding
+- Event Binding
+- Forms
+- Validations
+
+   
+                        Component Properties
+
+- A property is used to customize component.
+- You can modify a component with properties.
+- JSX elements can be configure with a set of properties, which allow to reuse and customize component according to state and situation.
+
+Syntax: Component without Properties
+    function Home()            
+    {
+       return ( <> </> );
+    }
+
+    <Home />
+
+- A component can configure properties using parameters, if it is a function component.
+- A component parameter is object type, with key and value.
+
+Syntax:
+    function Home(props)
+    {
+        returns( <> {props.key } </> )
+    }
+
+    <Home  key="value" />
+
+Ex:
+1. Add a new folder
+    "component-library"
+
+2. Add folder for "react-navbar"
+
+     react-navbar.jsx
+
+
+export function ReactNavbar(props){
+    return(
+        <nav className={"p-3 m-2 border border-1 d-flex justify-content-between " + props.ThemeName}>
+            <div>
+                <span className="h3">{props.BrandName}</span>
+            </div>
+            <div>
+                {
+                    props.MenuItems.map(item=>
+                        <span className="me-3"> <a>{item}</a> </span>
+                        )
+                }
+            </div>
+            <div>
+                <div className="input-group">
+                    <input type="text"  className="form-control"/>
+                    <button className="bi bi-search btn btn-warning"></button>
+                </div>
+            </div>
+        </nav>
+    )
+}
+
+3. You inject and use in any component
+
+progress-demo.jsx
+
+import { useRef, useState } from "react"
+import { ReactNavbar } from "../../component-library/react-navbar/react-navbar";
+
+export function ProgressDemo(){
+
+    const [Progressdisplay, setProgressDisplay] = useState('d-none');
+    const [ImageDisplay, setImageDisplay] = useState('d-none');
+    const [buttonDisplay, setButtonDisplay] = useState('d-block');
+    const [count, setCount] = useState(1);
+
+    let i = 1;
+    function Progress(){
+        i++;
+        setCount(i);
+        if(i==100){
+            setImageDisplay('d-block');
+            setProgressDisplay('d-none');
+        }
+    }
+
+    function LoadClick(){
+        setInterval(Progress,100);
+        setProgressDisplay('d-block');
+        setButtonDisplay('d-none');
+    }
+
+    return(
+        <div>
+            <header>
+                <ReactNavbar BrandName="Shopper." MenuItems={["Home", "Shop", "Blog", "Pages", "Contact"]} ThemeName="bg-dark text-white" />
+
+                <ReactNavbar BrandName="Tutorials" MenuItems={["Home", "Java", ".NET", "React", "Angular", "Blogs"]} ThemeName="bg-danger text-white" />
+            </header>
+            <div className="d-flex container-fluid justify-content-center align-items-center" style={{height:'100vh'}}>
+            <div className={buttonDisplay}>
+                <button onClick={LoadClick} className="btn btn-primary">Load Image</button>
+            </div>
+            <div className={Progressdisplay}>
+                <progress min="1" max="100" value={count} style={{width:'300px', height:'30px'}}></progress>
+                <p className="text-center">{count} % Completed</p>
+            </div>
+            <div className={ImageDisplay}>
+                <img src="m1.jpg" width="300" height="400" />
+            </div>
+          </div>
+        </div>
+    )
+}
+
+                         Conditional Rendering
+- A component can render different content.
+- It can be configure with multiple "return()" statements.
+- However component can return only one JSX fragment, which is decided using a condition.
+- The process of rendering various JSX fragments according to state and situation is known as "Conditional Rendering".
+
+Syntax:
+    function Component(props)
+    {
+       if(props.key==="somevalue"){
+        return (<> </> );
+       }
+      else {
+        return (<> </>);
+       }
+    }
+     
+Ex:
+react-grid.jsx
+
+export function ReactGrid(props){
+    if(props.layout==="grid"){
+        return(
+            <div className="container-fluid">
+                <table className="table table-hover caption-top">
+                    <caption>{props.caption}</caption>
+                    <thead>
+                        {
+                            props.fields.map(field=><th key={field}>{field}</th>)
+                        }
+                    </thead>
+                    <tbody>
+                        {
+                            props.data.map(item=>
+                                <tr key={item}>
+                                    {
+                                        Object.keys(item).map(key=>
+                                            <td>{item[key]}</td>
+                                            )
+                                    }
+                                </tr>
+                                )
+                        }
+                    </tbody>
+                </table>
+            </div>
+        )
+    } else {
+        return(
+            <div className="d-flex flex-wrap p-2 m-2">
+                {
+                    props.data.map(item=>
+                        <div className="card m-2 p-2" style={{width:'200px'}}>
+                            <div className="card-header">
+                                {item.FirstName}
+                            </div>
+                            <div className="card-footer">
+                                <button className="btn btn-primary w-100">Login</button>
+                            </div>
+                        </div>
+                        )
+                }
+            </div>
+        )
+    }
+}
+
+progress-demo.jsx
+
+import { useRef, useState } from "react"
+import { ReactNavbar } from "../../component-library/react-navbar/react-navbar";
+import { ReactGrid } from "../../component-library/react-grid/react-grid";
+
+export function ProgressDemo(){
+
+    const [Progressdisplay, setProgressDisplay] = useState('d-none');
+    const [ImageDisplay, setImageDisplay] = useState('d-none');
+    const [buttonDisplay, setButtonDisplay] = useState('d-block');
+    const [count, setCount] = useState(1);
+
+    let i = 1;
+    function Progress(){
+        i++;
+        setCount(i);
+        if(i==100){
+            setImageDisplay('d-block');
+            setProgressDisplay('d-none');
+        }
+    }
+
+    function LoadClick(){
+        setInterval(Progress,100);
+        setProgressDisplay('d-block');
+        setButtonDisplay('d-none');
+    }
+
+    return(
+        <div>
+            <header>
+                <ReactNavbar BrandName="Shopper." MenuItems={["Home", "Shop", "Blog", "Pages", "Contact"]} ThemeName="bg-dark text-white" />
+                <ReactNavbar BrandName="Tutorials" MenuItems={["Home", "Java", ".NET", "React", "Angular", "Blogs"]} ThemeName="bg-danger text-white" />
+            </header>
+            <section>
+                <h2>Grid Demo</h2>
+                <ReactGrid layout="grid" caption="Product Details - Updated Jan-2024" fields={["Name", "Price", "Rating"]} data={[{Name:"TV", Price:45000.44, Rating:4.5}, {Name:"Mobile", Price:12300.33, Rating:3.2}]} />
+                <h2>Employee Data</h2>
+                <ReactGrid caption="Employee Details - Recently Viewed Jan -2024" fields={["First Name", "Last Name"]} data={[{FirstName:"Raj", LastName:"Kumar"}]} />
+            </section>
+            <div className="d-flex container-fluid justify-content-center align-items-center" style={{height:'100vh'}}>
+            <div className={buttonDisplay}>
+                <button onClick={LoadClick} className="btn btn-primary">Load Image</button>
+            </div>
+            <div className={Progressdisplay}>
+                <progress min="1" max="100" value={count} style={{width:'300px', height:'30px'}}></progress>
+                <p className="text-center">{count} % Completed</p>
+            </div>
+            <div className={ImageDisplay}>
+                <img src="m1.jpg" width="300" height="400" />
+            </div>
+          </div>
+        </div>
+    )
+}
+
+
+                        Component Hooks
+See details
+Posted on 8:51 am, Jan 30 (IST) by Sudhakar Sharma
+Google logoGoogle LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA
+This email was sent to you because you indicated that you'd like to receive email notifications from Google Classroom. If you don't want to receive emails like this, you can unsubscribe or change your settings.
+sudhakar. Press Tab to insert.

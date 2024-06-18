@@ -1,0 +1,237 @@
+
+Conversation opened. 1 read message.
+
+Skip to content
+Using Gmail with screen readers
+sudhakar 
+21 of 38
+New material: "Route Params and Nested Routes"
+Inbox
+
+Sudhakar Sharma (Classroom) <no-reply@classroom.google.com>
+Tue, 13 Feb, 08:53
+to me
+
+
+Classroom Logo
+''	Notification settings
+REACT012024 React 7:30 AM	''
+NEW MATERIAL
+
+Route Params and Nested Routes
+Route
+RouteParams
+useParams()
+
+                        Child Routes / Nested Routes
+
+1. Child route is defined by using "<Route>" component with in the context of existing <Route>.
+
+      <Route path="parent"  element={<ParentElement />}>
+
+         <Route path="child"  element={ <ChildElement /> } />
+         
+       </Route>
+
+2. Child routes are configured with Link element as relative path.
+
+        <Link to="child">   </Link>
+
+3. The location of child component is defined using <Outlet>, which renders the child component within the context of parent.
+
+
+
+
+
+Ex:
+
+fakestore-details.jsx
+
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { Link, Outlet, useParams } from "react-router-dom"
+
+
+export function FakestoreDetails(){
+
+    const [product, setProduct] = useState({});
+
+    const params = useParams();
+
+    useEffect(()=>{
+         axios.get(`https://fakestoreapi.com/products/${params.id}`)
+         .then(res=> {
+             setProduct(res.data);
+         })
+    },[])
+
+    return(
+        <div className="container mt-3">
+            <div className="row">
+                <div className="col">
+                <h3>Details </h3>
+                <dl>
+                    <dt>Title</dt>
+                    <dd>{product.title}</dd>
+                    <dt>Price</dt>
+                    <dd>{product.price}</dd>
+                    <dt>Preview</dt>
+                    <dd>
+                        <img src={product.image} width="200" height="200" />
+                    </dd>
+                    <dd>
+                        <Link to={`ratings/${product.id}`} className="btn btn-success">Ratings & Description</Link>
+                    </dd>
+                </dl>
+                </div>
+                <div className="col">
+                        <Outlet />
+                </div>
+            </div>
+            <p>
+                <Link to={`/products/${product.category}`}>Back to Products</Link>
+            </p>
+        </div>
+    )
+}
+
+
+
+ fakestore-ratings.jsx
+
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom"
+
+
+export function FakestoreRatings(){
+
+    const [product, setProduct] = useState({id:0, title:'', price:0, description:'', category:'', image:'', rating:{rate:0, count:0}});
+
+    const params = useParams();
+
+    useEffect(()=>{
+
+        axios.get(`https://fakestoreapi.com/products/${params.id}`)
+        .then(res=> {
+            setProduct(res.data);
+        })
+
+    },[])
+
+    return(
+        <div>
+            <h3>Ratings & Description {params.id} </h3>
+            <span className="badge bg-success rounded p-2">
+                 {product.rating.rate} <span className="bi bi-star-fill text-white"></span>
+            </span>
+            <div className="mt-3">
+                <h4>Description</h4>
+                <textarea rows="4" cols="40" value={product.description}></textarea>
+            </div>
+        </div>
+    )
+}
+
+app.js
+
+      <Routes>
+             <Route path='/' element={<FakestoreIndex />} />  
+             <Route path='categories' element={<FakestoreCategories />} />
+             <Route path='products/:category' element= { <FakestoreProducts /> } />
+             <Route path='details/:id' element={ <FakestoreDetails /> } >
+                 <Route path='ratings/:id' element={ <FakestoreRatings /> } />
+             </Route>
+          </Routes>      
+
+FAQ: Can we define multiple route outlets?
+Ans: Yes.
+
+Syntax:
+        <div>
+            <Outlet />
+            <Outlet />
+        </div>
+
+FAQ: How to navigate dynamically?
+Ans : By using the hook "useNavigate()".
+
+
+Syntax:
+        let  navigate = useNavigate();
+
+        navigate("path", { options })
+
+Ex:
+ fakestore-index.jsx
+
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+
+export function FakestoreIndex(){
+
+    const [password, setPassword] = useState('');
+
+    let navigate = useNavigate();
+
+    function handlePwdChange(e) {
+        setPassword(e.target.value);
+    }
+
+    function handleLoginClick(){
+        if(password==="admin"){
+            navigate("/categories");
+        } else {
+            navigate("/invalid");
+        }
+    }
+
+    return (
+        <div className="container-fluid">
+           
+            <section>
+                <main className="text-center">
+                    <h1>Fakestore - Online Shopping</h1>
+                   
+                </main>
+                <div>
+                <dl>
+                        <dt>User Id</dt>
+                        <dd><input type="text" /></dd>
+                        <dt>Password</dt>
+                        <dd><input type="password" onChange={handlePwdChange} /></dd>
+                    </dl>
+                 <button className="btn btn-primary" onClick={handleLoginClick}>Login</button>
+                </div>
+            </section>
+        </div>
+    )
+}
+
+invalid.jsx
+
+import { Link } from "react-router-dom";
+
+
+export function Invalid(){
+    return(
+        <div>
+            <h2>Invalid Credentials</h2>
+            <Link to="/">Try Again</Link>
+        </div>
+    )
+}
+
+app.js
+
+    <Routes>
+        <Route  path="invalid"  element={ <Invalid /> } />
+    </Routes>
+
+
+                          Authorize & Authenticate
+See details
+Posted on 8:52 am, Feb 13 (IST) by Sudhakar Sharma
+Google logoGoogle LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA
+This email was sent to you because you indicated that you'd like to receive email notifications from Google Classroom. If you don't want to receive emails like this, you can unsubscribe or change your settings.
+sudhakar. Press Tab to insert.

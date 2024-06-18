@@ -1,0 +1,145 @@
+ 
+ 
+ Notification settings
+React - 18 Class room 2 7:30 AM NEW MATERIAL
+ 
+Event Binding
+Data Binding
+Style Binding
+Class Binding
+
+                             Event Binding
+
+- Event is a message sent by sender to its subscriber in order to notify the change.
+
+                function InsertClick()    => Subscriber
+                {
+                }
+
+                <button  onclick="InsertClick()">  => Sender
+
+- Subscriber comprises of the actions to perform.
+- Sender triggers a notification and invokes the actions defined by subscriber.
+- Event follows a communication pattern called "Observer". [Behavioural Patterns]
+- Event uses "Delegate" mechanism, which is a function pointer.
+
+Event Handler:
+- Every event is configured with a handler.
+
+        onclick                =>      Event
+        onclick="InsertClick()"    =>     Event Handler
+
+- React event handler can be defined using various techniques
+
+        <button onClick={ InsertClick }>
+        <button onClick={ () => InsertClick() }>
+
+- The function pointer  "{ InsertClick }"  can pass default "event" argument that send information about event and object.
+
+         function  InsertClick(e)
+         {
+            e.target.id (https://notifications.googleapis.com/email/redirect?t=AFG8qyW_kWj-rpSoQalsRFum0gR0tQMuM6CNT-wvJsSyR-BXhyj8OoSzHtbbbXyoa5MMaQpLVk6JhmxXJ6H4QdXqDg4Yb2Hq6F23zsYthdguaYe31O7Q8eFbFLAaoy8G7HsuFUkT9pm28ytVquepT8RNlq4He0lDhsdQP6Ss_w4AiB9wzUWl-ATbQ-sDUvIhvI3vp55Zejp_NYM3qXRRtQhlf-ldeblCxy2ha1oOpbuIuhXLyOKFtendOcJHd08_mD7ImmXTj9nb2cicNqVs5tWSfnDbKB2gP-3zGY-t7IEt5hLgC3jNM9-BkHZfkkO0dcn19TOR66A&r=eJzLKCkpsNLXT9UrSSxKTy3Ry0wBADz5Bm4&s=ALHZ2r7fy-xVQLYkm88181gkZnAO), name, className, value etc..
+            e.clientX, clientY, keyCode, shiftKey, ctrlKey etc..
+         }
+
+        <button onClick={ Insertlick } >
+
+- The function return  " { () => InsertClick('values') }> " allows to pass custom args.
+- You can pass any type of arguments
+        a) Primitive
+        b) Non Primitive
+
+        function InsertClick(ref)
+        {
+        }
+       
+        <button onClick={ ( ) => InsertClick(anyValue) }>
+
+
+- The function return also allows to pass the default arguments along with custom arguments.
+
+           function InsertClick('custom', e)
+        {
+        }
+
+        <button onClick={ (e) => InsertClick('customValue', e)
+
+        e.target.id (https://notifications.googleapis.com/email/redirect?t=AFG8qyVAp4PukMMTGlQxapthITOkRqkk8pfgNIxOTvvscif7B00HhpQqH7U6FwNgTEIB8voXt9WzMG12gW4teF7vpXYNOcPo4_ZgFk53qOAjvl7Q4xG7LkwomDPuq2pKEdhw7DZfjkZH7X0jj3_j388jC2-fnIXfWHXJN9qYkwAmTflX7tvtP2lXbb_mJBb7MkUbw7yaiQx8-rTnxEfLk7Za5jCDHmtpzmkngltPxujXaZP5RNHy-6O8RBmRotGJ-OVpyX7c7t2CN-TCAAKGJm-59UeA8vxc2iOnnUPNbUgKPAMjIt_O4t6ROwkl_3qQU83RJXpzjas&r=eJzLKCkpsNLXT9UrSSxKTy3Ry0wBADz5Bm4&s=ALHZ2r7XTGsg5qQj4lTTfUCVlmZp), name, className..
+        e.clientX, clientY, keyCode ...
+
+Ex:
+event-demo.jsx
+
+export function EventDemo(){
+
+    function InsertClick(cities, id){
+        alert(${cities}\n${id});
+    }
+
+    return(
+        <div className="container-fluid">
+            <button id="btnInsert" onClick={(e)=>InsertClick(['Delhi','Hyd'], e.target.id (https://notifications.googleapis.com/email/redirect?t=AFG8qyXOj8hAhd1KBWuIqSWWTnS675k2g8BHHSFv2v0xfvOebGoi_c_SlcMKbzQXEWIYKR6PYgmaKiXglza9d9bCTCn8NR3KQ4HO8M_ZbjtFuQMtMEchKrdiYOBePVVZjjroINhpetv43DMUVTiT7hLAmYdQknS9i6Q665U8VJ-ZSWtTbfCEkAxn30MvcLodTbsJNBSNAWN-PlhcSOijzSBNtqnE0tPTIw8k_xG6ifQYCq2mWQxSrJRBuxe4hJ_cgxnVqvuG3AReTfSxa-tRHVMU4-83yM-YXW4zbcktEAko6ZM5VONZKmQZ2973Wu6uYUR83aEjuss&r=eJzLKCkpsNLXT9UrSSxKTy3Ry0wBADz5Bm4&s=ALHZ2r6rDuaAQHMVek1QkG0BXoWH))}>Insert</button>
+        </div>
+    )
+}
+
+- All events are configured by JavaScript  window object. Hence they are reffered as Browser Events. [BOM]
+
+- React uses a library called "SyntheticEvents", which map to Browser Events.
+
+        SyntheticEvents        => Virtual DOM Events
+        Browser Events        => DOM Events
+
+           Virtual DOM               DOM
+        [SyntheticEvent]           [Browser Event]
+        ----------------------------------------------------------
+          onClick                    onclick
+          onChange                onchange
+          onFocus                onfocus
+          onSubmit                onsubmit
+          etc...
+
+- Event Propagation & Prevent Default
+- PreventDefault is used to stop the default functionality configured for "Generic" elements in a <form>.
+
+Ex:
+event-demo.jsx
+
+export function EventDemo(){
+
+
+    return(
+        <div className="container-fluid">
+            <form onSubmit={(e)=> { e.preventDefault(); alert('Submit Clicked');}}>
+                Name : <input type="text" name="UserName" /> <button type="submit">Submit</button>
+            </form>
+        </div>
+    )
+}
+
+- StopPropagation will not allow the child events to simulate and trigger the parent events.
+
+Ex:
+event-demo.jsx
+
+export function EventDemo(){
+
+    function ContainerClick(){
+        alert('Container Clicked');
+    }
+
+    function ButtonClick(e){
+        alert('ButtonClicked');
+        e.stopPropagation();
+    }
+
+    return(
+        <div className="container-fluid">
+            <div className="m-4 p-4 bg-warning" onClick={ContainerClick}>
+                <h3>Parent</h3>
+                <button className="btn btn-dark" onClick={ButtonClick}>Button</button>
+            </div>
+        </div>
+    )
+}
+

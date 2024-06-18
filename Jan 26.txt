@@ -1,0 +1,124 @@
+Formik Components
+<Formik>
+<Form>
+<Field>
+<ErrorMessage>
+
+- Verifying every field in a form is known as "Input State Validation".
+- Input State individually verifies the values in every field.
+- Formik provides "Form State Validation".
+- A form state returns boolean true or false based on all validation errors defined in form container.
+- Form state comprises of services like
+
+            valid            : It returns true if all fields are valid
+            invalid        : It returns true if any one field is invalid
+            dirty            : It returns true if any one field modified its value.
+
+    <Formik>
+      {
+         form => <Form> </Form>
+          }
+    </Form>
+
+            {form.isValid}
+            {form.isInvalid}
+            {form.dirty}
+            {form.touched}
+            {form.values}
+            {form.errors}
+
+Ex:
+import { useFormik, Formik, Form, ErrorMessage, Field } from "formik";
+import { useEffect } from "react";
+import * as yup from "yup";
+
+export function FormikDemo(){
+
+    return(
+        <div className="container-fluid">
+            <Formik initialValues={{Name:'',Price:'', VendorContact:''}} validationSchema={yup.object({Name:yup.string().required('Name Required').min(4, 'Name too short'), Price: yup.number().min(1000,"Min 1000 required").max(10000, "Max 10000 only"), VendorContact:yup.string().matches(/\+91\d{10}/,"Invalid Mobile +91 10digits").required("Mobile Required")})} onSubmit={(values)=>{alert(JSON.stringify(values))}} >
+                {
+                    form =>
+                    <Form>
+                        <dl>
+                            <dt>Name</dt>
+                            <dd> <Field type="text" name="Name"  /> </dd>
+                            <dd className="text-danger"> <ErrorMessage name="Name" /> </dd>
+                            <dt>Price</dt>
+                            <dd> <Field type="text" name="Price" /> </dd>
+                            <dd className="text-danger"> <ErrorMessage name="Price" /> </dd>
+                            <dt>Vendor Contact</dt>
+                            <dd> <Field type="text" name="VendorContact" /> </dd>
+                            <dd className="text-danger"> <ErrorMessage name="VendorContact" /> </dd>
+                        </dl>
+                        <button disabled={(form.isValid)?false:true} >Submit</button> 
+                        <button className={(form.dirty)?'d-inline':'d-none'}>Save</button>
+                    </Form>
+                }
+            </Formik>
+        </div>
+    )
+}
+    
+                               React Hook Form
+                         (3rd Party Form Library)
+
+1. Install hook form library
+
+        >npm  i react-hook-form --save                (npmjs.com)
+
+2. It provides "useForm" hook to configure a form element.
+
+    import  { useForm  }  from  "react-hook-form";
+
+    const  { formName, handleSubmit, formState: {errors} } = useForm();
+
+    formName        => reference name for form element to acces all its services.
+    handleSubmit        => it configures actions on submit
+    formState        => it provides errors object, that can handle input state                                  validation.
+
+
+3. Bind "useForm" with input elements to configure field and errors.
+
+    <input  type="text" name="Name"  {...register("Name", { validationAttributes }) } />
+
+4. Access the errors from element and display in UI by using the formstate error object.
+    - Every field validation is configured as optional in hook-form library.
+    - Hence you have to define as optional field
+        
+  {error.fieldName?.type==='validationType')?<span></pan>:<span></span> }
+
+    - Make sure that all validation services are configured with error messages
+    - You can use logical operators "&& , || " to bind multiple expressions.
+
+Ex:
+hook-form-demo.jsx
+
+import { useForm } from "react-hook-form" ;
+
+export function HookFormDemo(){
+
+    const {register, handleSubmit, formState:{errors}} = useForm();
+
+    const submit = (values)=> {
+        alert(JSON.stringify(values));
+    }
+
+
+
+
+    return(
+        <div className="container-fluid">
+           <form onSubmit={handleSubmit(submit)}>
+                <dl>
+                    <dt>Name</dt>
+                    <dd><input type="text" name="Name" {...register("Name",{ required:true, minLength:4 })} /></dd>
+                    <dd className="text-danger">
+                       {(errors.Name?.type==='required')?<span>Name Required</span>:<span></span> && (errors.Name?.type==='minLength')?<span>Name too short</span>:<span></span> }
+                    </dd>
+                </dl>
+                <button>Submit</button>
+           </form>
+        </div>
+    )
+}

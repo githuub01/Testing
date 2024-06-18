@@ -1,0 +1,365 @@
+
+Conversation opened. 1 unread message.
+
+Skip to content
+Using Gmail with screen readers
+Enable desktop notifications for Gmail.
+   OK  No thanks
+8 of 6,629
+New material: "Cookies and Sass"
+Inbox
+
+Sudhakar Sharma (Classroom) <no-reply@classroom.google.com>
+Wed, Dec 27, 8:51 AM (1 day ago)
+to me
+
+
+Classroom Logo
+''	Notification settings
+Full Stack Web with React 7:15 AM Mr. Sudhakar Sharma	''
+NEW MATERIAL
+
+Cookies and Sass
+jQuery Cookies
+                        ============
+
+1. Install Cookie library for jQuery
+
+    >npm install  jquery.cookie  --save
+
+2. Link the cookie library file
+
+    <script src="../node_modules/jquery.cookie/jquery.cookie.js"></script>
+
+3. Create a cookie
+
+      $.cookie("name", "value", { expiry : daysNumber })
+
+4. To access cookie value
+
+      $.cookie("name")
+
+5. To verify cookie
+
+      $.cookie("name")===undefined         => returns true if cookie deleted
+
+6. To remove cookie
+
+      $.removeCookie("name")
+
+
+Ex:
+1. login.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script src="../node_modules/jquery.cookie/jquery.cookie.js"></script>
+    <script>
+         $(function(){
+             $("button").click(()=>{
+                   $.cookie("username", $("#UserName").val(), { expires: 2 });
+                   location.href = "success.html";
+             })
+         })
+    </script>
+</head>
+<body>
+    <h2>Login</h2>
+    <input type="text" id="UserName" placeholder="User Name"> <button>Login</button>
+</body>
+</html>
+
+2. success.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success</title>
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script src="../node_modules/jquery.cookie/jquery.cookie.js"></script>
+    <script>
+         $(function(){
+              if($.cookie("username")===undefined) {
+                  location.href = "login.html";
+              } else {
+                $("#lblName").html($.cookie("username"));
+              }
+           
+            $("button").click(()=>{
+                $.removeCookie("username");
+                location.href = "login.html";
+            })
+         })
+    </script>
+</head>
+<body>
+    <h3>Hello ! <span id="lblName"></span> <button>Signout</button> </h3>
+</body>
+</html>
+
+                                Sass
+                      (Syntactically Awesome Style Sheet)
+
+- It is CSS pre-processor or pre-compiler.
+- It provides all programming features so that you can re-use, separate and make the logic simplified for styles.
+- You have to trans compile sass into css.
+
+Install Sass on your PC:
+
+    C:\> npm  install  -g   sass
+
+
+Create sass file in your project:
+
+        input.scss
+
+     .container {
+     border:2px solid red;
+     padding: 20px;
+     h2 {
+          color:red;
+     }
+     p {
+        font-family:Arial;
+     }
+     }
+
+Translate into CSS:
+- Open the scss file location in terminal
+
+     >sass  input.scss  output.css            // for compiling
+
+- It will generate a new file by name output.css with css code.
+- Link output.css to any HTML page.
+
+Note: After every modification in SCSS file your have transcompile the code.
+
+Ex:
+1.  input.scss
+
+.container {
+    border: 2px solid red;
+    border-radius: 20px;
+    background-color: rgb(249, 214, 214);
+    padding: 20px;
+    h2 {
+        color:rgb(187, 13, 13);
+    }
+    p {
+        color:rgb(235, 130, 130);
+    }
+}
+
+> sass input.scss  output.css
+
+2. index.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../src/scss/output.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Delete Record</h2>
+        <p>Record will be deleted</p>
+    </div>
+</body>
+</html>
+
+                                  Sass Variables
+- Sass variables are declared by using
+     $name : value;
+
+- Value can any CSS value type.
+        10px, Arial,  red ...
+
+- You can access and use variable by using "$refName"
+
+Ex:
+input.scss
+
+$bgcolor : rgb(214, 249, 226);
+$txtColor : green;
+
+.container {
+    border: 2px solid red;
+    border-radius: 20px;
+    background-color: $bgcolor;
+    padding: 20px;
+    h2 {
+        color:$txtColor;
+    }
+    p {
+        color:rgb(235, 130, 130);
+    }
+}
+table {
+    background-color: $bgcolor;
+    color: $txtColor;
+}
+
+
+index.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../src/scss/output.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Delete Record</h2>
+        <p>Record will be deleted</p>
+    </div>
+    <br><br>
+    <table width="300" border="1">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+    </table>
+</body>
+</html>
+
+
+                        Sass Built in Functions
+                            [Statements]
+- @If
+- @else if
+- @else
+- @for
+
+Syntax:
+    @if  condition
+    {
+
+    }
+    @else
+    {
+    }
+
+Ex:
+input.scss
+
+$bgcolor : gray;
+$txtColor : black;
+$border : 2px solid black;
+$themeName : red;
+
+
+@if $themeName==green
+{
+    $bgcolor : rgb(214, 249, 226);
+    $txtColor : green;
+    $border : 2px solid green;
+}
+@else if $themeName==red
+{
+    $bgcolor : rgb(249, 217, 214);
+    $txtColor : rgb(128, 0, 0);
+    $border : 2px solid red;
+} @else {
+    $bgcolor : gray;
+    $txtColor : black;
+    $border : 2px solid black;
+}
+
+.container {
+    border: $border;
+    border-radius: 20px;
+    background-color: $bgcolor;
+    padding: 20px;
+    h2 {
+        color:$txtColor;
+    }
+    p {
+        color:rgb(235, 130, 130);
+    }
+}
+
+index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../src/scss/output.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Delete Record</h2>
+        <p>Record will be deleted</p>
+    </div>
+   
+</body>
+</html>
+
+Syntax:
+    @for  $i  from 1 through 10
+    {
+    }
+
+    #{ }         => binding expression
+
+Ex:
+input.scss
+
+div {
+    width: 100px;
+    height: 100px;
+    border:2px solid black;
+}
+@for $i from 1 through 4
+{
+     .box-#{$i} {
+        margin-left: $i * 100px;
+     }
+}
+
+index.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../src/scss/output.css">
+</head>
+<body>
+    <div class="box-1">
+        <img src="../public/images/a1.jpg" width="100" height="100">
+    </div>
+    <div class="box-2">
+        <img src="../public/images/a2.jpg" width="100" height="100">
+    </div>
+    <div class="box-3">
+        <img src="../public/images/a3.jpg" width="100" height="100">
+    </div>
+    <div class="box-4">
+        <img src="../public/images/a4.jpg" width="100" height="100">
+    </div>
+
+</body>
+</html>
+See details
+Posted on 8:50 AM, Dec 27 (IST) by Sudhakar Sharma
+Google logoGoogle LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA
+This email was sent to you because you indicated that you'd like to receive email notifications from Google Classroom. If you don't want to receive emails like this, you can unsubscribe or change your settings.

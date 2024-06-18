@@ -1,0 +1,146 @@
+
+Conversation opened. 1 read message. 
+
+Skip to content
+Using Gmail with screen readers
+sudhakar 
+23 of 38
+New material: "Routing in React"
+Inbox
+
+Sudhakar Sharma (Classroom) <no-reply@classroom.google.com>
+Sat, 10 Feb, 08:50
+to me
+
+
+Classroom Logo
+''	Notification settings
+REACT012024 React 7:30 AM	''
+NEW MATERIAL
+
+Routing in React
+- Install routing library
+
+    >npm  install react-router-dom  --save
+
+- Route Components
+
+    <BrowserRouter>        It creates virtual routes that maps to actual DOM location
+                        object. Make sure that the complete routing in application
+                        is configured with in the scope of Browser Router.
+
+    <Routes>            It configures a virtual Route Table, which contains
+                        collection of routes in your application.        
+
+
+    <Route>                It configures a route path with component to render.
+                        It can be nested with child routes.
+
+    <Outlet>                It defines the location to render requested content.                                It is mostly required for child routes.
+
+    <Link>                It is used to configure a hyperlink that navigates to the                             path defined in routing. You can't use <a> anchor element.
+
+- Route Hooks
+   
+    useNavigate()            It is used to configure dynamic navigation.
+
+    useParams()            It is used to access the route parameters.
+
+    useSearchParams()    It is used to access the query string from URL.
+
+
+Configuring a Route Table:
+
+    <BrowserRouter>
+        <Routes>
+            <Route  path=" "    element={ }   />
+            <Route  path=" "    element={ }  />
+        </Routes>
+    </BrowserRouter>
+
+- You can configure default route for application using "/" as route path
+
+        <Route  path="/"    element={ <default component to render> }  />
+
+- You can configure wild card route for application using  "*", which refers to component to render when request path is not available. [not-found]
+
+        <Route path="*"   element={ <not found> } />
+
+- You can configure a Link for navigation, which refers to route path.
+
+        <Link  to="pathName">  Text | Image </Link>
+
+FAQ: What is difference between "Absolute Path & Relative Path"?
+Ans: Relative Path refers to a child path, which is added to current path.
+       
+            <Link  to="watches">         relative
+
+            http://localhost:3000/mobiles/watches
+
+    Absolute path refers from the root level it is not relative to current path.
+
+            <Link to="/watches">        absolute
+           
+            http://localhost:3000/watches
+
+ Ex:    "react-routing-project"
+
+1. Install
+   > npm install  bootstrap  bootstrap-icons  react-router-dom   --save
+
+2. Goto to index.js
+
+import "../node_modules/bootstrap/dist/css/bootstrap.css";
+import "../node_modules/bootstrap-icons/font/bootstrap-icons.css";
+import * as bootstrap from "bootstrap";
+
+3. Go to "src/app.js"
+
+import logo from './logo.svg';
+import './App.css';
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
+
+function App() {
+  return (
+    <div className="mt-4 container">
+      <BrowserRouter>
+       <header>
+          <button data-bs-toggle="offcanvas" data-bs-target="#navbar" className='bi bi-justify btn btn-dark'></button>
+          <div className='offcanvas offcanvas-start' id="navbar">
+             <div className='offcanvas-header'>
+                <h1>Shopper</h1>
+                <button className='btn btn-close' data-bs-dismiss="offcanvas"></button>
+             </div>
+             <div className='offcanvas-body'>
+              <nav>
+                 <ul className='list-unstyled'>
+                  <li> <Link to="/"> Home </Link> </li>
+                  <li> <Link to="mobiles"> Mobiles </Link> </li>
+                  <li>  <Link to="watches"> Watches </Link> </li>
+                 </ul>
+             </nav>
+             </div>
+          </div>
+       </header>
+       <section>
+           
+               <hr />
+               <Routes>
+                   <Route path='/' element={<div>Mobiles | Watches | Footware | Fashion </div>} />
+                   <Route path='mobiles' element={<div><h2>Mobiles</h2><p>Iphone 14 | Samsung | Realme</p></div>} />
+                   <Route path='watches' element={<div><h2>Watches</h2><p>Fossil | Fastrack | Apple</p></div>} />
+                   <Route path='*' element={<div><code>Not Found : Category you looking for not found.</code></div>} />
+               </Routes>
+         
+       </section>
+       </BrowserRouter>
+    </div>
+  );
+}
+
+export default App;
+See details
+Posted on 8:49 am, Feb 10 (IST) by Sudhakar Sharma
+Google logoGoogle LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043 USA
+This email was sent to you because you indicated that you'd like to receive email notifications from Google Classroom. If you don't want to receive emails like this, you can unsubscribe or change your settings.
+sudhakar. Press Tab to insert.

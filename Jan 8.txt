@@ -1,0 +1,83 @@
+                         Date Type
+- Date in JavaScript is configured using a "Date()" constructor
+- React uses all JavaScript date manipulates using get & set methods.
+
+Syntax:
+        var  mfd  = new Date("year-month-day  hrs:min:sec.milliSeconds");
+        var  now = new Date();
+
+Date Methods:
+        getHours()                setHours()
+        getMinutes()                setMinutes()
+        getSeconds()                setSeconds()
+        getMilliSeconds()            setMilliSeconds()
+        getDay()                    setDate()
+        getDate()                    setMonth()
+        getMonth()                setYear()
+        getFullYear()
+        toString()
+        toLocaleString()
+        toDateString()
+        toTimeString()
+        toLocaleDateString()
+        toLocaleTimeString()
+
+Syntax:
+        var  mfd  = new Date("2024-01-21  16:23:45.67");
+        
+        { mfd.toLocaleDateString() }
+
+Note: A react component can't store and use data from a variable. 
+          Variables a immutable types and component can't use immutable data.
+
+                    
+                          State in React Component
+                      ------------------------------------
+- HTTP is a state less protocol.
+- It removes the memory allocated for a request when it completes the request.
+- React components are handled over multiple requests, hence they require a state to store the data and use across requests.
+- React provides state for class components, but not for function components.
+- React 18 introduced new Hooks [methods] to configure a state for function component. 
+                           "useState()"
+
+Configuring State for React Function Component:
+
+1. Import useState hook from react core library
+
+    import  { useState  }  from "react";
+
+2. useState provides 2 members [accessors] 
+    
+    a) getter to read value
+    b) setter to write value
+
+    const  [getter, setter] = useState();
+    const  [name, setName] = useState('John'); => state is any type
+
+    { name }
+
+Ex:
+data-binding.jsx
+
+import './data-binding.css';
+
+import { useState } from 'react';
+
+export function DataBinding(){
+
+    const [product] = useState({Name:'TV', Price:50000.33});
+    const [categories] = useState(["All","Electronics","Fashion"]);
+  
+    return(
+        <div className="container-fluid">
+            Name : {product.Name} <br/>
+            Price : {product.Price}
+            <ul>
+              {
+                categories.map(category=> <li key={category}> { category }</li>)
+              }
+            </ul>
+        </div>
+    )
+}
+                    Data Binding Techniques

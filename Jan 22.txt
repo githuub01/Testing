@@ -1,0 +1,133 @@
+Stop Propagation
+Prevent Default
+Event Args
+
+Mouse Events
+Keyboard
+Touch Events
+Element State Events
+
+
+                         Clipboard Events
+onCut
+onCopy
+onPaste
+
+FAQ: How to disable paste in any element? How to disable copy and cut from element?
+Ans:  Any event you can disable by returning "false". It requires the DOM events to invoke and return false.
+
+        document.onpaste = () => return false;
+        document.onselectstart = () => return false;
+        document.oncopy = () => return false;
+
+Ex:
+key-demo.jsx
+
+import axios from "axios"
+import { useState } from "react"
+
+export function KeyDemo()
+{
+    const [status, setStatus] = useState('');
+
+    function handleCopy(){
+        setStatus("Number Copied");
+    }
+    function handleBlur(){
+        setStatus("");
+    }
+    function handlePaste(){
+        document.onpaste = ()=> {
+            return false;
+        }
+    }
+    
+    return (
+        <div className="container-fluid">
+           <dl>
+            <h3>Verify Account</h3>
+            <dt>Account Number</dt>
+            <dd><input type="text" onCopy={handleCopy} onBlur={handleBlur} /></dd>
+            <dd>{status}</dd>
+            <dt>Confirm Number</dt>
+            <dd><input type="text" onPaste={handlePaste} /></dd>
+           </dl>
+        </div>
+    )
+}
+
+                             Form Events
+onSubmit
+onReset
+
+- The form events are defined for <form> element.
+- They can be controlled only with generic elements 
+    a) Submit Button
+    b) Reset Button
+
+Syntax:
+        <form  onSubmit={  }  onReset={ }>
+
+            <button type="submit"> Submit </button>
+            <button type="reset"> Reset </button>
+        </form>
+
+FAQ:
+1. Can we have multiple forms in a component?
+A. Yes.
+
+2. Can we define a form within the context of another form?
+A. No. Always uses multi level components instead of "forms".
+
+    <form>
+        parent
+        <form>
+            child
+        </form>
+    </form>
+
+3. Can a form have multiple submit buttons?
+A. Yes.
+
+4. Why you need multiple submit buttons?
+A. To handle various actions using single form.
+
+5. How form knows which submit button is clicked?
+A. By accessing the form elements reference using "target" attribute.
+
+Ex:
+import axios from "axios"
+import { useState } from "react"
+
+export function KeyDemo()
+{
+    function SubmitClick(e){
+        e.preventDefault();
+        for(var item of e.target){
+            if(item.name=="submit"){
+                if(item.value=="Insert"){
+                    console.log("Record Inserted");
+                    break;
+                } else {
+                    console.log("Record Deleted");
+                }
+            }
+        }
+    }
+    
+    return (
+        <div className="container-fluid">
+           <form onSubmit={SubmitClick}>
+              <dl>
+                <dt>User Name</dt>
+                <dd><input type="text" name="UserName"/></dd>
+              </dl>
+              <button name="submit" value="Insert" type="submit">Insert</button>
+              <button name="submit" value="Delete" type="submit">Delete</button>
+           </form>
+        </div>
+    )
+}
+
+6. How to access data from all elements in form on submit?
+A.

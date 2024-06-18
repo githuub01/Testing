@@ -1,0 +1,77 @@
+formik
+react-hook-form
+yup
+
+FAQ: What is debounce?
+Ans : It is the process of making any task inactive for a specific duration of time and 
+     release into process after specified time interval.
+
+     You can control by using timer events
+
+        a) setTimeout()
+        b) clearTimeout()
+        c) setInterval()
+        d) clearInterval()
+
+Syntax:
+    setTimeout(function(){} , interval)
+    clearTimeout(reference);
+
+
+                               useRef() 
+- It is a new hook introduced into react 18x version.
+- It creates a memory reference, which is used internally by the process and not for rendering in UI.
+- Techically it can manage application "Threads" in process.
+- It is a reference used dynamically, hence the default value is "null".
+
+    let  task = useRef(null);
+    task.current = someTask();
+    
+- You can access the task from reference memory using "current" property.
+
+Syntax:
+       task.current = setTimeout(()=>{}, interval);
+
+       clearTimeout(task.current);
+
+Ex:
+ debounce-demo.jsx
+
+import { useRef, useState } from "react"
+
+export function DebounceDemo(){
+
+    const [msg, setMsg] = useState('');
+    let flag = useRef(null);
+
+    function Msg1(){
+        setMsg('Hello !');
+    }
+    function Msg2(){
+        setMsg('How are you ?');
+    }
+    function Msg3(){
+        setMsg('Welcome to React Events');
+    }
+
+    function PlayClick(){
+       setTimeout(Msg1, 3000);
+       flag.current =  setTimeout(Msg2, 6000);
+       setTimeout(Msg3, 10000);
+    }
+    function PauseClick(){
+        clearTimeout(flag.current);
+    }
+
+    return(
+        <div className="container-fluid">
+            <div className="mt-4">
+                <button onClick={PlayClick} className="bi me-3 bi-play btn btn-dark"></button>
+                <button onClick={PauseClick} className="bi bi-pause btn btn-dark"></button>
+            </div>
+            <div className="mt-4">
+                <span className="h2"> {msg} </span>
+            </div>
+        </div>
+    )
+}
